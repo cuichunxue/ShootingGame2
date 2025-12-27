@@ -25,10 +25,10 @@ const GRADE_CURRICULUMS = {
                     const emojis = ['🍎', '🍊', '🍌', '🍇', '🍓', '⚽', '🎈', '⭐', '🌸', '🦋'];
                     const emoji = emojis[Math.floor(Math.random() * emojis.length)];
                     return {
-                        question: `${emoji} ${a} + ${b} = ?`,
+                        question: `${emoji} ${a} + ${b}`,
                         answer: a + b,
                         strategy: [],
-                        hint: '指で数えてもいいよ！'
+                        hint: ''
                     };
                 }
             },
@@ -80,7 +80,7 @@ const GRADE_CURRICULUMS = {
                         question: `${item}${a}個−${b}個`,
                         answer: a - b,
                         strategy: [],
-                        hint: '残りはいくつ？'
+                        hint: ''
                     };
                 }
             },
@@ -131,7 +131,7 @@ const GRADE_CURRICULUMS = {
                         question: `💰 ${a}円+${b}円`,
                         answer: a + b,
                         strategy: [],
-                        hint: '全部でいくら？'
+                        hint: ''
                     };
                 }
             }
@@ -165,7 +165,7 @@ const GRADE_CURRICULUMS = {
                         question: `💴 100円で${price}円のおかし、おつりは？`,
                         answer: paid - price,
                         strategy: [100 - price],
-                        hint: '100円から引こう'
+                        hint: ''
                     };
                 }
             },
@@ -200,7 +200,7 @@ const GRADE_CURRICULUMS = {
                         question: `🎯 ${a} + ${b}`,
                         answer: a + b,
                         strategy: [hundreds],
-                        hint: '100のかたまりで考えよう'
+                        hint: ''
                     };
                 }
             },
@@ -256,7 +256,7 @@ const GRADE_CURRICULUMS = {
                         question: `📏 ${m}m = ?cm`,
                         answer: m * 100,
                         strategy: [100, m * 100],
-                        hint: '1m=100cm だよ'
+                        hint: ''
                     };
                 }
             },
@@ -274,7 +274,7 @@ const GRADE_CURRICULUMS = {
                         question: `⏰ ${s}分+${d}分`,
                         answer: s + d,
                         strategy: [],
-                        hint: '時計で考えよう'
+                        hint: ''
                     };
                 }
             },
@@ -300,7 +300,7 @@ const GRADE_CURRICULUMS = {
                         question: `🛒 ${item1.name}${item1.price}円と${item2.name}${item2.price}円`,
                         answer: total,
                         strategy: [Math.round(total / 10) * 10],
-                        hint: '合計いくら？'
+                        hint: ''
                     };
                 }
             },
@@ -403,7 +403,7 @@ const GRADE_CURRICULUMS = {
                         question: `${emoji}${total}個÷${people}人`,
                         answer: each,
                         strategy: [people * each],
-                        hint: '1人何個？'
+                        hint: ''
                     };
                 }
             },
@@ -442,7 +442,7 @@ const GRADE_CURRICULUMS = {
                         question: `⚖️ ${item.name}${item.weight}g×${count}個`,
                         answer: item.weight * count,
                         strategy: [item.weight * count],
-                        hint: '全部で何g？'
+                        hint: ''
                     };
                 }
             },
@@ -458,7 +458,7 @@ const GRADE_CURRICULUMS = {
                         question: `📏 ${a}cm+${b}cm=?m`,
                         answer: Math.floor((a + b) / 100),
                         strategy: [a + b],
-                        hint: '100cm=1m'
+                        hint: ''
                     };
                 }
             },
@@ -475,7 +475,7 @@ const GRADE_CURRICULUMS = {
                         question: `🛒 ${p}円×${count}個`,
                         answer: p * count,
                         strategy: [p * count],
-                        hint: '全部でいくら？'
+                        hint: ''
                     };
                 }
             },
@@ -491,7 +491,7 @@ const GRADE_CURRICULUMS = {
                         question: `🕐 ${start}時〜${end}時`,
                         answer: end - start,
                         strategy: [end - start],
-                        hint: '何時間？'
+                        hint: ''
                     };
                 }
             }
@@ -514,92 +514,135 @@ const GRADE_CURRICULUMS = {
             units: { level: 3, correct: 0, total: 0 }
         },
         templates: [
-            // 億、兆の数
-            {
-                type: 'large_numbers',
-                category: 'addition',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 1000 + Math.floor(Math.random() * 9000);
-                    const b = 500 + Math.floor(Math.random() * 5000);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: '' };
-                }
-            },
-            // 2桁×2桁
-            {
-                type: 'multiplication_2digit',
-                category: 'multiplication',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 11 + Math.floor(Math.random() * 9);
-                    const b = 11 + Math.floor(Math.random() * 9);
-                    return { question: `${a} × ${b}`, answer: a * b, strategy: [], hint: '筆算でやろう' };
-                }
-            },
-            // かけ算の工夫 (25×4=100)
+            // ×25のコツ (×100÷4)
             {
                 type: 'multiplication_25trick',
                 category: 'multiplication',
                 skillLevel: 2,
                 generate: () => {
-                    const n = 1 + Math.floor(Math.random() * 9);
-                    return { question: `25 × ${n * 4}`, answer: 25 * n * 4, strategy: [100 * n], hint: '25×4=100' };
+                    const n = 4 + Math.floor(Math.random() * 21);  // 4-24
+                    return {
+                        question: `💡 ${n} × 25`,
+                        answer: n * 25,
+                        strategy: [n * 100, n * 100 / 4],
+                        hint: ''
+                    };
                 }
             },
-            // わり算 (3桁÷2桁)
+            // 2桁×2桁 - 分配法則
             {
-                type: 'division_3digit',
+                type: 'multiplication_2digit',
+                category: 'multiplication',
+                skillLevel: 1,
+                generate: () => {
+                    const a = 11 + Math.floor(Math.random() * 19);
+                    const b = 11 + Math.floor(Math.random() * 19);
+                    return {
+                        question: `🧮 ${a} × ${b}`,
+                        answer: a * b,
+                        strategy: [Math.floor(a / 10) * 10 * b, (a % 10) * b],
+                        hint: ''
+                    };
+                }
+            },
+            // 小数：買い物の合計
+            {
+                type: 'decimal_shopping',
+                category: 'decimal',
+                skillLevel: 1,
+                generate: () => {
+                    const prices = [1.5, 2.3, 3.7, 4.2, 5.8];
+                    const p1 = prices[Math.floor(Math.random() * prices.length)];
+                    const p2 = prices[Math.floor(Math.random() * prices.length)];
+                    const total = Math.round((p1 + p2) * 10) / 10;
+                    return {
+                        question: `🛒 ${p1}kg+${p2}kg`,
+                        answer: total,
+                        strategy: [],
+                        hint: ''
+                    };
+                }
+            },
+            // わり算：分ける問題
+            {
+                type: 'division_sharing',
                 category: 'division',
                 skillLevel: 1,
                 generate: () => {
-                    const answer = 5 + Math.floor(Math.random() * 20);
-                    const b = 11 + Math.floor(Math.random() * 9);
-                    return { question: `${answer * b} ÷ ${b}`, answer, strategy: [], hint: '' };
+                    const people = 12 + Math.floor(Math.random() * 13);  // 12-24
+                    const each = 5 + Math.floor(Math.random() * 10);     // 5-14
+                    const total = people * each;
+                    return {
+                        question: `🎁 ${total}個÷${people}人`,
+                        answer: each,
+                        strategy: [people * each],
+                        hint: ''
+                    };
                 }
             },
-            // 小数のたし算
+            // 面積：部屋の広さ
             {
-                type: 'decimal_addition',
-                category: 'decimal',
-                skillLevel: 1,
-                generate: () => {
-                    const a = (1 + Math.floor(Math.random() * 9)) + (Math.floor(Math.random() * 9)) / 10;
-                    const b = (1 + Math.floor(Math.random() * 9)) + (Math.floor(Math.random() * 9)) / 10;
-                    const answer = Math.round((a + b) * 10) / 10;
-                    return { question: `${a.toFixed(1)} + ${b.toFixed(1)}`, answer, strategy: [], hint: '小数点をそろえよう' };
-                }
-            },
-            // 小数のひき算
-            {
-                type: 'decimal_subtraction',
-                category: 'decimal',
-                skillLevel: 1,
-                generate: () => {
-                    const a = (5 + Math.floor(Math.random() * 5)) + (Math.floor(Math.random() * 9)) / 10;
-                    const b = (1 + Math.floor(Math.random() * 4)) + (Math.floor(Math.random() * 9)) / 10;
-                    const answer = Math.round((a - b) * 10) / 10;
-                    return { question: `${a.toFixed(1)} − ${b.toFixed(1)}`, answer, strategy: [], hint: '小数点をそろえよう' };
-                }
-            },
-            // 面積 (長方形)
-            {
-                type: 'area_rectangle',
+                type: 'area_room',
                 category: 'units',
                 skillLevel: 1,
                 generate: () => {
-                    const w = 5 + Math.floor(Math.random() * 15);
-                    const h = 5 + Math.floor(Math.random() * 15);
-                    return { question: `長方形：縦${h}cm、横${w}cm の面積は?`, answer: w * h, strategy: [], hint: '縦×横' };
+                    const w = 3 + Math.floor(Math.random() * 5);   // 3-7m
+                    const h = 4 + Math.floor(Math.random() * 5);   // 4-8m
+                    return {
+                        question: `🏠 部屋：縦${h}m×横${w}m`,
+                        answer: w * h,
+                        strategy: [w * h],
+                        hint: ''
+                    };
                 }
             },
-            // 面積 (正方形)
+            // 小数×整数
             {
-                type: 'area_square',
-                category: 'units',
-                skillLevel: 1,
+                type: 'decimal_multiplication',
+                category: 'decimal',
+                skillLevel: 2,
                 generate: () => {
-                    const s = 5 + Math.floor(Math.random() * 15);
-                    return { question: `正方形：1辺${s}cm の面積は?`, answer: s * s, strategy: [], hint: '1辺×1辺' };
+                    const decimal = (2 + Math.floor(Math.random() * 6)) + Math.floor(Math.random() * 9) / 10;
+                    const mult = 3 + Math.floor(Math.random() * 7);  // 3-9
+                    const answer = Math.round(decimal * mult * 10) / 10;
+                    return {
+                        question: `📐 ${decimal.toFixed(1)} × ${mult}`,
+                        answer,
+                        strategy: [Math.floor(decimal) * mult, Math.round((decimal % 1) * mult * 10) / 10],
+                        hint: ''
+                    };
+                }
+            },
+            // わり算：速さの問題導入
+            {
+                type: 'division_speed_intro',
+                category: 'division',
+                skillLevel: 2,
+                generate: () => {
+                    const speed = 60;  // 時速60km
+                    const time = 2 + Math.floor(Math.random() * 4);  // 2-5時間
+                    const distance = speed * time;
+                    return {
+                        question: `🚗 ${distance}km÷${time}時間`,
+                        answer: speed,
+                        strategy: [speed * time],
+                        hint: ''
+                    };
+                }
+            },
+            // 面積：正方形のタイル
+            {
+                type: 'area_tiles',
+                category: 'units',
+                skillLevel: 2,
+                generate: () => {
+                    const side = 8 + Math.floor(Math.random() * 9);  // 8-16
+                    return {
+                        question: `🟦 正方形タイル：1辺${side}cm`,
+                        answer: side * side,
+                        strategy: [side * side],
+                        hint: ''
+                    };
                 }
             }
         ]
@@ -680,7 +723,7 @@ const GRADE_CURRICULUMS = {
                     const denom = 5 + Math.floor(Math.random() * 5);
                     const a = 1 + Math.floor(Math.random() * (denom - 2));
                     const b = 1 + Math.floor(Math.random() * (denom - a - 1));
-                    return { question: `${a}/${denom} + ${b}/${denom}`, answer: a + b, strategy: [], hint: '分母はそのまま' };
+                    return { question: `${a}/${denom} + ${b}/${denom}`, answer: a + b, strategy: [], hint: '' };
                 }
             },
             // 分数のひき算 (同分母)
@@ -692,7 +735,7 @@ const GRADE_CURRICULUMS = {
                     const denom = 5 + Math.floor(Math.random() * 5);
                     const a = 3 + Math.floor(Math.random() * (denom - 3));
                     const b = 1 + Math.floor(Math.random() * (a - 1));
-                    return { question: `${a}/${denom} − ${b}/${denom}`, answer: a - b, strategy: [], hint: '分母はそのまま' };
+                    return { question: `${a}/${denom} − ${b}/${denom}`, answer: a - b, strategy: [], hint: '' };
                 }
             },
             // 体積 (直方体)
@@ -704,7 +747,7 @@ const GRADE_CURRICULUMS = {
                     const l = 2 + Math.floor(Math.random() * 8);
                     const w = 2 + Math.floor(Math.random() * 8);
                     const h = 2 + Math.floor(Math.random() * 8);
-                    return { question: `直方体：縦${l}cm、横${w}cm、高さ${h}cm の体積は?`, answer: l * w * h, strategy: [], hint: '縦×横×高さ' };
+                    return { question: `直方体：縦${l}cm、横${w}cm、高さ${h}cm の体積は?`, answer: l * w * h, strategy: [], hint: '' };
                 }
             },
             // 体積 (立方体)
@@ -714,7 +757,7 @@ const GRADE_CURRICULUMS = {
                 skillLevel: 1,
                 generate: () => {
                     const s = 2 + Math.floor(Math.random() * 8);
-                    return { question: `立方体：1辺${s}cm の体積は?`, answer: s * s * s, strategy: [], hint: '1辺×1辺×1辺' };
+                    return { question: `立方体：1辺${s}cm の体積は?`, answer: s * s * s, strategy: [], hint: '' };
                 }
             },
             // 平均
@@ -729,7 +772,7 @@ const GRADE_CURRICULUMS = {
                     }
                     const sum = nums.reduce((a, b) => a + b, 0);
                     const avg = sum / nums.length;
-                    return { question: `${nums.join(', ')} の平均は?`, answer: avg, strategy: [sum], hint: '合計÷個数' };
+                    return { question: `${nums.join(', ')} の平均は?`, answer: avg, strategy: [sum], hint: '' };
                 }
             }
         ]
@@ -761,7 +804,7 @@ const GRADE_CURRICULUMS = {
                     const numer = 1 + Math.floor(Math.random() * (denom - 1));
                     const mult = 2 + Math.floor(Math.random() * 5);
                     const answerNumer = numer * mult;
-                    return { question: `${numer}/${denom} × ${mult}`, answer: answerNumer, strategy: [], hint: '分子だけかける' };
+                    return { question: `${numer}/${denom} × ${mult}`, answer: answerNumer, strategy: [], hint: '' };
                 }
             },
             // 分数÷整数
@@ -774,7 +817,7 @@ const GRADE_CURRICULUMS = {
                     const numer = div * (1 + Math.floor(Math.random() * 5));
                     const denom = 3 + Math.floor(Math.random() * 7);
                     const answerNumer = numer / div;
-                    return { question: `${numer}/${denom} ÷ ${div}`, answer: answerNumer, strategy: [], hint: '分子だけわる' };
+                    return { question: `${numer}/${denom} ÷ ${div}`, answer: answerNumer, strategy: [], hint: '' };
                 }
             },
             // 分数のたし算 (異分母)
@@ -791,7 +834,7 @@ const GRADE_CURRICULUMS = {
                     const numer2 = 1;
                     const lcm = denom2; // simplified for these pairs
                     const answer = Math.round((numer1 * (lcm / denom1) + numer2 * (lcm / denom2)));
-                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: [lcm], hint: '通分しよう' };
+                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: [lcm], hint: '' };
                 }
             },
             // 比
@@ -827,7 +870,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const speed = 40 + Math.floor(Math.random() * 60);
                     const time = 2 + Math.floor(Math.random() * 4);
-                    return { question: `時速${speed}kmで${time}時間進むと?`, answer: speed * time, strategy: [], hint: '速さ×時間' };
+                    return { question: `時速${speed}kmで${time}時間進むと?`, answer: speed * time, strategy: [], hint: '' };
                 }
             },
             // 速さ (時間を求める)
@@ -839,7 +882,7 @@ const GRADE_CURRICULUMS = {
                     const speed = 40 + Math.floor(Math.random() * 60);
                     const time = 2 + Math.floor(Math.random() * 4);
                     const distance = speed * time;
-                    return { question: `${distance}kmを時速${speed}kmで進むと何時間?`, answer: time, strategy: [], hint: '道のり÷速さ' };
+                    return { question: `${distance}kmを時速${speed}kmで進むと何時間?`, answer: time, strategy: [], hint: '' };
                 }
             },
             // 速さ (速度を求める)
@@ -851,7 +894,7 @@ const GRADE_CURRICULUMS = {
                     const speed = 40 + Math.floor(Math.random() * 60);
                     const time = 2 + Math.floor(Math.random() * 4);
                     const distance = speed * time;
-                    return { question: `${distance}kmを${time}時間で進むと時速?`, answer: speed, strategy: [], hint: '道のり÷時間' };
+                    return { question: `${distance}kmを${time}時間で進むと時速?`, answer: speed, strategy: [], hint: '' };
                 }
             },
             // 円の面積
@@ -862,7 +905,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const r = 5 + Math.floor(Math.random() * 10);
                     const answer = Math.round(r * r * 3.14 * 10) / 10;
-                    return { question: `半径${r}cmの円の面積は? (円周率3.14)`, answer, strategy: [r * r], hint: '半径×半径×3.14' };
+                    return { question: `半径${r}cmの円の面積は? (円周率3.14)`, answer, strategy: [r * r], hint: '' };
                 }
             },
             // 円の円周
@@ -873,7 +916,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const r = 5 + Math.floor(Math.random() * 10);
                     const answer = Math.round(2 * r * 3.14 * 10) / 10;
-                    return { question: `半径${r}cmの円の円周は? (円周率3.14)`, answer, strategy: [2 * r], hint: '直径×3.14' };
+                    return { question: `半径${r}cmの円の円周は? (円周率3.14)`, answer, strategy: [2 * r], hint: '' };
                 }
             }
         ]
