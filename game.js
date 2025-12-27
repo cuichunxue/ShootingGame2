@@ -39,13 +39,22 @@
             targets: [],
             particles: [],
 
-            // OPTIMIZED: Cached crosshair (reused, not recreated)
-            crosshair: null,
-            crosshairTargetPos: { x: 0, y: 0, z: -8 },
-            crosshairCurrentPos: { x: 0, y: 0, z: -8 },
+            // OPTIMIZED: Dual crosshairs for two hands
+            crosshairs: [null, null],
+            crosshairTargetPos: [
+                { x: 0, y: 0, z: -8 },
+                { x: 0, y: 0, z: -8 }
+            ],
+            crosshairCurrentPos: [
+                { x: 0, y: 0, z: -8 },
+                { x: 0, y: 0, z: -8 }
+            ],
 
-            // Hand state
-            handState: { state: 'idle', cooldownEnd: 0 },
+            // Hand states for both hands
+            handStates: [
+                { state: 'idle', cooldownEnd: 0 },
+                { state: 'idle', cooldownEnd: 0 }
+            ],
 
             // Timing
             gameStartTime: 0,
@@ -806,14 +815,17 @@
         }
 
         // ============================================
-        // CROSSHAIR (LARGE, VISIBLE)
+        // DUAL CROSSHAIRS (LARGE, VISIBLE) - FOR TWO HANDS
         // ============================================
-        function initCrosshair() {
+        function createSingleCrosshair(index) {
             const group = new THREE.Group();
+
+            // Different colors for each hand (hand 0 = cyan, hand 1 = magenta)
+            const defaultColor = index === 0 ? 0x00ffff : 0xff00ff;
 
             // Large outer ring - very visible
             const ringMat = new THREE.MeshBasicMaterial({
-                color: 0x00ff00,  // Green by default
+                color: defaultColor,
                 opacity: 0.8,
                 transparent: true,
                 side: THREE.DoubleSide
@@ -844,7 +856,7 @@
 
             // Cross lines for better visibility
             const lineMat = new THREE.MeshBasicMaterial({
-                color: 0x00ff00,
+                color: defaultColor,
                 opacity: 0.6,
                 transparent: true,
                 side: THREE.DoubleSide
@@ -863,40 +875,60 @@
             group.add(lineV);
 
             group.visible = false;
-            STATE.scene.add(group);
-            STATE.crosshair = group;
+            group.userData.handIndex = index;  // Store which hand this belongs to
+            return group;
+        }
+
+        function initCrosshair() {
+            // Create two crosshairs for two hands
+            for (let i = 0; i < 2; i++) {
+                const crosshair = createSingleCrosshair(i);
+                STATE.scene.add(crosshair);
+                STATE.crosshairs[i] = crosshair;
+            }
         }
 
         // Change crosshair color (green = normal, red = firing)
-        function setCrosshairColor(color) {
-            if (!STATE.crosshair) return;
-            STATE.crosshair.children.forEach(child => {
+        function setCrosshairColor(handIndex, color) {
+            const crosshair = STATE.crosshairs[handIndex];
+            if (!crosshair) return;
+            crosshair.children.forEach(child => {
                 if (child.material) {
                     child.material.color.setHex(color);
                 }
             });
         }
 
-        function updateCrosshairPosition(targetX, targetY, targetZ) {
-            STATE.crosshairTargetPos.x = targetX;
-            STATE.crosshairTargetPos.y = targetY;
-            STATE.crosshairTargetPos.z = targetZ;
+        function updateCrosshairPosition(handIndex, targetX, targetY, targetZ) {
+            STATE.crosshairTargetPos[handIndex].x = targetX;
+            STATE.crosshairTargetPos[handIndex].y = targetY;
+            STATE.crosshairTargetPos[handIndex].z = targetZ;
         }
 
-        function interpolateCrosshair() {
-            if (!STATE.crosshair) return;
+        function interpolateCrosshair(handIndex) {
+            const crosshair = STATE.crosshairs[handIndex];
+            if (!crosshair) return;
 
             const lerp = CONFIG.CROSSHAIR_LERP;
-            STATE.crosshairCurrentPos.x += (STATE.crosshairTargetPos.x - STATE.crosshairCurrentPos.x) * lerp;
-            STATE.crosshairCurrentPos.y += (STATE.crosshairTargetPos.y - STATE.crosshairCurrentPos.y) * lerp;
-            STATE.crosshairCurrentPos.z += (STATE.crosshairTargetPos.z - STATE.crosshairCurrentPos.z) * lerp;
+            STATE.crosshairCurrentPos[handIndex].x += (STATE.crosshairTargetPos[handIndex].x - STATE.crosshairCurrentPos[handIndex].x) * lerp;
+            STATE.crosshairCurrentPos[handIndex].y += (STATE.crosshairTargetPos[handIndex].y - STATE.crosshairCurrentPos[handIndex].y) * lerp;
+            STATE.crosshairCurrentPos[handIndex].z += (STATE.crosshairTargetPos[handIndex].z - STATE.crosshairCurrentPos[handIndex].z) * lerp;
 
-            STATE.crosshair.position.set(
-                STATE.crosshairCurrentPos.x,
-                STATE.crosshairCurrentPos.y,
-                STATE.crosshairCurrentPos.z
+            crosshair.position.set(
+                STATE.crosshairCurrentPos[handIndex].x,
+                STATE.crosshairCurrentPos[handIndex].y,
+                STATE.crosshairCurrentPos[handIndex].z
             );
-            STATE.crosshair.lookAt(STATE.camera.position);
+            crosshair.lookAt(STATE.camera.position);
+        }
+
+        // Convenience function to interpolate all visible crosshairs
+        function interpolateAllCrosshairs() {
+            for (let i = 0; i < 2; i++) {
+                if (STATE.crosshairs[i] && STATE.crosshairs[i].visible) {
+                    interpolateCrosshair(i);
+                }
+            }
         }
 
         // ============================================
@@ -1160,46 +1192,40 @@
         }
 
         // ============================================
-        // HAND GESTURE FSM - FLICK UP TO SHOOT
+        // HAND GESTURE FSM - FLICK UP TO SHOOT (DUAL HAND SUPPORT)
         // Improved classification of: tremor vs movement vs shooting
         // ============================================
 
-        // Shooting detection - IMPROVED with velocity history
-        let prevIndexY = 0.5;
-        let velocityHistory = [];  // Track velocity over multiple frames
+        // Constants for shooting detection
         const VELOCITY_HISTORY_SIZE = 4;
-        const FLICK_THRESHOLD = 0.03;  // Lower threshold, but require consistency
-        const FLICK_ACCUMULATED = 0.08;  // Total movement required
-        let canShoot = true;  // Prevents rapid fire
-        let lastShootTime = 0;
+        const FLICK_THRESHOLD = 0.03;
+        const FLICK_ACCUMULATED = 0.08;
         const SHOOT_COOLDOWN = 400;  // ms between shots
-
-        // Position tracking for movement classification
-        let posHistory = [];  // [{x, y, time}, ...]
         const POS_HISTORY_SIZE = 6;
-        let smoothedX = 0;
-        let smoothedY = 0;
 
-        // Movement direction tracking (to detect consistent vs erratic movement)
-        let moveDirectionX = 0;
-        let moveDirectionY = 0;
-
-        function updateHandGestures() {
-            const now = performance.now();
-
-            if (!STATE.handsData || STATE.handsData.length === 0) {
-                STATE.handState.state = 'idle';
-                if (STATE.crosshair) STATE.crosshair.visible = false;
-                updateHandStatus(false);
-                prevIndexY = 0.5;
-                velocityHistory = [];
-                return;
+        // Tracking data for each hand (array index = hand index)
+        const handTracking = [
+            {
+                prevIndexY: 0.5,
+                velocityHistory: [],
+                lastShootTime: 0,
+                posHistory: [],
+                smoothedX: 0,
+                smoothedY: 0
+            },
+            {
+                prevIndexY: 0.5,
+                velocityHistory: [],
+                lastShootTime: 0,
+                posHistory: [],
+                smoothedX: 0,
+                smoothedY: 0
             }
+        ];
 
-            // Hand detected!
-            updateHandStatus(true);
-
-            const landmarks = STATE.handsData[0];
+        // Process a single hand's gestures
+        function processSingleHand(handIndex, landmarks, now) {
+            const tracking = handTracking[handIndex];
 
             // Thumb landmarks
             const thumbTip = landmarks[4];
@@ -1230,13 +1256,13 @@
             // === SHOOTING DETECTION - IMPROVED ===
             // Track velocity over multiple frames for more reliable detection
             const currentY = indexTip.y;
-            const currentVelocity = prevIndexY - currentY;  // Positive = moving up
-            prevIndexY = currentY;
+            const currentVelocity = tracking.prevIndexY - currentY;  // Positive = moving up
+            tracking.prevIndexY = currentY;
 
             // Add to velocity history
-            velocityHistory.push(currentVelocity);
-            if (velocityHistory.length > VELOCITY_HISTORY_SIZE) {
-                velocityHistory.shift();
+            tracking.velocityHistory.push(currentVelocity);
+            if (tracking.velocityHistory.length > VELOCITY_HISTORY_SIZE) {
+                tracking.velocityHistory.shift();
             }
 
             // Check for flick pattern:
@@ -1244,11 +1270,11 @@
             // 2. Total accumulated movement exceeds threshold
             // 3. Cooldown has passed
             let isFlickUp = false;
-            const cooldownPassed = (now - lastShootTime) > SHOOT_COOLDOWN;
+            const cooldownPassed = (now - tracking.lastShootTime) > SHOOT_COOLDOWN;
 
-            if (velocityHistory.length >= 2 && cooldownPassed && canShoot) {
+            if (tracking.velocityHistory.length >= 2 && cooldownPassed) {
                 // Check if recent velocities are all positive (upward)
-                const recentVelocities = velocityHistory.slice(-3);
+                const recentVelocities = tracking.velocityHistory.slice(-3);
                 const allUpward = recentVelocities.every(v => v > FLICK_THRESHOLD * 0.5);
 
                 // Calculate accumulated movement
@@ -1268,21 +1294,21 @@
             const worldZ = 0;
 
             // Add to position history
-            posHistory.push({ x: rawX, y: rawY, time: now });
-            if (posHistory.length > POS_HISTORY_SIZE) {
-                posHistory.shift();
+            tracking.posHistory.push({ x: rawX, y: rawY, time: now });
+            if (tracking.posHistory.length > POS_HISTORY_SIZE) {
+                tracking.posHistory.shift();
             }
 
             // Calculate current movement delta
-            const dx = rawX - smoothedX;
-            const dy = rawY - smoothedY;
+            const dx = rawX - tracking.smoothedX;
+            const dy = rawY - tracking.smoothedY;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             // Check if movement is consistent (same direction) or erratic (tremor)
             let isConsistentMove = false;
-            if (posHistory.length >= 3) {
+            if (tracking.posHistory.length >= 3) {
                 // Calculate direction of recent movement
-                const recent = posHistory.slice(-3);
+                const recent = tracking.posHistory.slice(-3);
                 const dirX = recent[2].x - recent[0].x;
                 const dirY = recent[2].y - recent[0].y;
                 const dirMag = Math.sqrt(dirX * dirX + dirY * dirY);
@@ -1303,8 +1329,8 @@
             const SMALL_MOVE = 0.2;   // Lower threshold for quicker response
             const LARGE_MOVE = 1.0;   // Lower threshold for fast response
 
-            let worldX = smoothedX;
-            let worldY = smoothedY;
+            let worldX = tracking.smoothedX;
+            let worldY = tracking.smoothedY;
             let moveSpeed = 0;
 
             if (distance > LARGE_MOVE) {
@@ -1322,63 +1348,94 @@
             }
 
             // Apply movement
-            smoothedX += dx * moveSpeed;
-            smoothedY += dy * moveSpeed;
-            worldX = smoothedX;
-            worldY = smoothedY;
+            tracking.smoothedX += dx * moveSpeed;
+            tracking.smoothedY += dy * moveSpeed;
+            worldX = tracking.smoothedX;
+            worldY = tracking.smoothedY;
 
             // ALWAYS show crosshair when hand is detected
-            updateCrosshairPosition(worldX, worldY, worldZ);
-            if (STATE.crosshair) {
-                STATE.crosshair.visible = true;
+            updateCrosshairPosition(handIndex, worldX, worldY, worldZ);
+            const crosshair = STATE.crosshairs[handIndex];
+            if (crosshair) {
+                crosshair.visible = true;
                 // Change color based on state
                 if (isGunPose && isIndexExtended) {
-                    setCrosshairColor(0x00ff00);  // Green - ready to fire
+                    setCrosshairColor(handIndex, 0x00ff00);  // Green - ready to fire
                 } else if (isGunPose) {
-                    setCrosshairColor(0xffff00);  // Yellow
+                    setCrosshairColor(handIndex, 0xffff00);  // Yellow
                 } else {
-                    setCrosshairColor(0x888888);  // Gray
+                    setCrosshairColor(handIndex, 0x888888);  // Gray
                 }
             }
 
-            switch (STATE.handState.state) {
+            // State machine for this hand
+            const handState = STATE.handStates[handIndex];
+            switch (handState.state) {
                 case 'idle':
-                    if (isGunPose && isIndexExtended) STATE.handState.state = 'ready';
+                    if (isGunPose && isIndexExtended) handState.state = 'ready';
                     break;
 
                 case 'ready':
                     // Fire when quick upward flick detected
                     if (isGunPose && isFlickUp) {
-                        STATE.handState.state = 'fired';
-                        lastShootTime = now;  // Track shoot time
-                        velocityHistory = [];  // Clear velocity history after shot
-                        fireShot();
+                        handState.state = 'fired';
+                        tracking.lastShootTime = now;  // Track shoot time
+                        tracking.velocityHistory = [];  // Clear velocity history after shot
+                        fireShot(handIndex);
                     } else if (!isGunPose) {
-                        STATE.handState.state = 'idle';
+                        handState.state = 'idle';
                     }
                     break;
 
                 case 'fired':
-                    STATE.handState.state = 'cooldown';
-                    STATE.handState.cooldownEnd = now + SHOOT_COOLDOWN;
+                    handState.state = 'cooldown';
+                    handState.cooldownEnd = now + SHOOT_COOLDOWN;
                     break;
 
                 case 'cooldown':
-                    if (now >= STATE.handState.cooldownEnd) {
+                    if (now >= handState.cooldownEnd) {
                         if (isGunPose && isIndexExtended) {
-                            STATE.handState.state = 'ready';
+                            handState.state = 'ready';
                         } else if (isGunPose) {
-                            STATE.handState.state = 'ready';
+                            handState.state = 'ready';
                         } else {
-                            STATE.handState.state = 'idle';
+                            handState.state = 'idle';
                         }
                     }
                     break;
             }
         }
 
+        // Main update function for all hands
+        function updateHandGestures() {
+            const now = performance.now();
+
+            // Hide all crosshairs if no hands detected
+            if (!STATE.handsData || STATE.handsData.length === 0) {
+                for (let i = 0; i < 2; i++) {
+                    STATE.handStates[i].state = 'idle';
+                    if (STATE.crosshairs[i]) STATE.crosshairs[i].visible = false;
+                }
+                updateHandStatus(0);
+                return;
+            }
+
+            // Show hand count status
+            updateHandStatus(STATE.handsData.length);
+
+            // Process each detected hand (up to 2)
+            for (let i = 0; i < Math.min(STATE.handsData.length, 2); i++) {
+                processSingleHand(i, STATE.handsData[i], now);
+            }
+
+            // Hide unused crosshairs if only one hand is detected
+            if (STATE.handsData.length < 2) {
+                if (STATE.crosshairs[1]) STATE.crosshairs[1].visible = false;
+            }
+        }
+
         // Show hand tracking status
-        function updateHandStatus(detected) {
+        function updateHandStatus(handCount) {
             let status = document.getElementById('handStatus');
             if (!status) {
                 status = document.createElement('div');
@@ -1386,27 +1443,35 @@
                 status.style.cssText = 'position:fixed;bottom:20px;left:20px;padding:10px 15px;border-radius:8px;font-size:14px;font-weight:bold;z-index:1000;';
                 document.body.appendChild(status);
             }
-            if (detected) {
-                status.textContent = '✋ 手を検出中';
-                status.style.background = 'rgba(0,255,0,0.8)';
-                status.style.color = '#000';
-            } else {
+            if (handCount === 0) {
                 status.textContent = '👆 手を見せてね';
                 status.style.background = 'rgba(255,100,100,0.8)';
                 status.style.color = '#fff';
+            } else if (handCount === 1) {
+                status.textContent = '✋ 手を検出中 (1)';
+                status.style.background = 'rgba(0,255,0,0.8)';
+                status.style.color = '#000';
+            } else {
+                status.textContent = '✋✋ 両手を検出中! (2)';
+                status.style.background = 'rgba(0,255,255,0.8)';
+                status.style.color = '#000';
             }
         }
 
-        function fireShot() {
+        function fireShot(handIndex) {
             playSFX('shoot');
             STATE.player.shots++;
 
             // Change crosshair to RED when firing
-            setCrosshairColor(0xff0000);
-            setTimeout(() => setCrosshairColor(0x00ff00), 200);  // Back to green
+            setCrosshairColor(handIndex, 0xff0000);
+            setTimeout(() => {
+                // Return to default color for this hand
+                const defaultColor = handIndex === 0 ? 0x00ffff : 0xff00ff;
+                setCrosshairColor(handIndex, defaultColor);
+            }, 200);
 
-            // Create muzzle flash effect
-            createMuzzleFlash();
+            // Create muzzle flash effect at crosshair position
+            createMuzzleFlash(handIndex);
 
             // Small screen shake for shooting
             triggerScreenShake(0.15);
@@ -1416,9 +1481,9 @@
 
             // Convert world position to NDC (-1 to 1)
             const crosshairWorld = new THREE.Vector3(
-                STATE.crosshairCurrentPos.x,
-                STATE.crosshairCurrentPos.y,
-                STATE.crosshairCurrentPos.z
+                STATE.crosshairCurrentPos[handIndex].x,
+                STATE.crosshairCurrentPos[handIndex].y,
+                STATE.crosshairCurrentPos[handIndex].z
             );
             const ndc = crosshairWorld.clone().project(STATE.camera);
 
@@ -1644,8 +1709,9 @@
         }
 
         // Muzzle flash effect
-        function createMuzzleFlash() {
-            if (!STATE.crosshair || !STATE.crosshair.visible) return;
+        function createMuzzleFlash(handIndex) {
+            const crosshair = STATE.crosshairs[handIndex];
+            if (!crosshair || !crosshair.visible) return;
 
             // Create multiple flash particles
             for (let i = 0; i < 5; i++) {
@@ -1656,9 +1722,9 @@
                 const dist = Math.random() * 0.5;
 
                 p.position.set(
-                    STATE.crosshair.position.x + Math.cos(angle) * dist,
-                    STATE.crosshair.position.y + Math.sin(angle) * dist,
-                    STATE.crosshair.position.z + 0.5
+                    crosshair.position.x + Math.cos(angle) * dist,
+                    crosshair.position.y + Math.sin(angle) * dist,
+                    crosshair.position.z + 0.5
                 );
 
                 // Yellow/orange flash colors
@@ -1760,18 +1826,26 @@
             requestAnimationFrame(animateRing);
         }
 
-        // Crosshair pulse effect on hit
+        // Crosshair pulse effect on hit (pulses all visible crosshairs)
         function pulseCrosshair() {
-            if (!STATE.crosshair) return;
-
             let pulseScale = 1.5;
             const animatePulse = () => {
                 pulseScale -= 0.08;
                 if (pulseScale > 1) {
-                    STATE.crosshair.scale.setScalar(pulseScale);
+                    // Pulse all visible crosshairs
+                    for (let i = 0; i < 2; i++) {
+                        if (STATE.crosshairs[i] && STATE.crosshairs[i].visible) {
+                            STATE.crosshairs[i].scale.setScalar(pulseScale);
+                        }
+                    }
                     requestAnimationFrame(animatePulse);
                 } else {
-                    STATE.crosshair.scale.setScalar(1);
+                    // Reset scale
+                    for (let i = 0; i < 2; i++) {
+                        if (STATE.crosshairs[i]) {
+                            STATE.crosshairs[i].scale.setScalar(1);
+                        }
+                    }
                 }
             };
             requestAnimationFrame(animatePulse);
@@ -2618,7 +2692,7 @@
             // Update all systems
             updateTargets(deltaTime);
             updateParticles(deltaTime);
-            interpolateCrosshair();
+            interpolateAllCrosshairs();
             updateScreenShake();
             updateBgFlash();
             updateHUD();
@@ -2856,12 +2930,12 @@
             const t = (targetZ - rayOrigin.z) / rayDir.z;
             const hitPoint = rayOrigin.add(rayDir.multiplyScalar(t));
 
-            // Move and show crosshair
-            if (STATE.crosshair) {
-                STATE.crosshair.position.set(hitPoint.x, hitPoint.y, targetZ + 2);
-                STATE.crosshair.visible = true;
-                STATE.crosshair.lookAt(STATE.camera.position);
-                setCrosshairColor(0xff0000);  // Red when shooting
+            // Move and show first crosshair for touch/click
+            if (STATE.crosshairs[0]) {
+                STATE.crosshairs[0].position.set(hitPoint.x, hitPoint.y, targetZ + 2);
+                STATE.crosshairs[0].visible = true;
+                STATE.crosshairs[0].lookAt(STATE.camera.position);
+                setCrosshairColor(0, 0xff0000);  // Red when shooting
             }
 
             // Play sound
@@ -2892,10 +2966,10 @@
 
             // Hide crosshair after a moment
             setTimeout(() => {
-                if (STATE.crosshair) {
-                    setCrosshairColor(0x00ff00);  // Back to green
+                if (STATE.crosshairs[0]) {
+                    setCrosshairColor(0, 0x00ffff);  // Back to cyan (hand 0 color)
                     if (!STATE.modelReady) {
-                        STATE.crosshair.visible = false;
+                        STATE.crosshairs[0].visible = false;
                     }
                 }
             }, 200);
