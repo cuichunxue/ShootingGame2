@@ -1135,7 +1135,7 @@
                 });
 
                 STATE.hands.setOptions({
-                    maxNumHands: 1,
+                    maxNumHands: 2,  // Enable detection of both hands
                     modelComplexity: 0,
                     minDetectionConfidence: 0.5,  // Slightly lower for better detection
                     minTrackingConfidence: 0.4
