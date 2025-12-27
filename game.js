@@ -242,11 +242,13 @@
                 }
             }
 
+            // Ensure answer is always first, then add strategy and distractors
             const allNumbers = [q.answer, ...q.strategy, ...Array.from(distractors)];
             const uniqueNumbers = [...new Set(allNumbers)].slice(0, CONFIG.MAX_TARGETS);
 
+            // Double-check: if answer somehow got removed, force it back at the start
             if (!uniqueNumbers.includes(q.answer)) {
-                uniqueNumbers[uniqueNumbers.length - 1] = q.answer;
+                uniqueNumbers[0] = q.answer;  // Replace first element with answer
             }
 
             return { ...q, allNumbers: uniqueNumbers };
@@ -1025,17 +1027,21 @@
             sprite.position.set(0, 0.2, 1.2);  // Position in front of balloon
             sprite.scale.set(2.0, 2.0, 1);  // Larger number
 
+            // Speed variation: 30% chance of faster balloon
+            const speedMultiplier = Math.random() < 0.3 ? 1.8 : 1.0;
+
             target.userData = {
                 number,
                 isAnswer,
                 isStrategy,
                 velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.015,
-                    0.012 + Math.random() * 0.008,
-                    (Math.random() - 0.5) * 0.008
+                    (Math.random() - 0.5) * 0.015 * speedMultiplier,
+                    (0.012 + Math.random() * 0.008) * speedMultiplier,
+                    (Math.random() - 0.5) * 0.008 * speedMultiplier
                 ),
                 sprite,
-                pulsePhase: Math.random() * Math.PI * 2
+                pulsePhase: Math.random() * Math.PI * 2,
+                speedMultiplier  // Store for visual effect
             };
 
             target.visible = true;
