@@ -1362,13 +1362,18 @@
             const crosshair = STATE.crosshairs[handIndex];
             if (crosshair) {
                 crosshair.visible = true;
+
+                // Hand-specific colors for better distinction
+                const readyColor = handIndex === 0 ? 0x00ffff : 0xff00ff;  // Cyan or Magenta
+                const partialColor = handIndex === 0 ? 0x00aaaa : 0xaa00aa;  // Darker cyan/magenta
+
                 // Change color based on state
                 if (isGunPose && isIndexExtended) {
-                    setCrosshairColor(handIndex, 0x00ff00);  // Green - ready to fire
+                    setCrosshairColor(handIndex, readyColor);  // Ready to fire (bright)
                 } else if (isGunPose) {
-                    setCrosshairColor(handIndex, 0xffff00);  // Yellow
+                    setCrosshairColor(handIndex, partialColor);  // Partial gesture (darker)
                 } else {
-                    setCrosshairColor(handIndex, 0x888888);  // Gray
+                    setCrosshairColor(handIndex, 0x888888);  // Gray - not ready
                 }
             }
 
