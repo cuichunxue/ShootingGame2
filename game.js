@@ -1189,6 +1189,10 @@
 
         function onHandsResults(results) {
             STATE.handsData = results.multiHandLandmarks || [];
+            // Debug: Log hand count
+            if (STATE.handsData.length > 0) {
+                console.log(`[MediaPipe] Detected ${STATE.handsData.length} hand(s)`);
+            }
         }
 
         // ============================================
@@ -1443,16 +1447,20 @@
                 status.style.cssText = 'position:fixed;bottom:20px;left:20px;padding:10px 15px;border-radius:8px;font-size:14px;font-weight:bold;z-index:1000;';
                 document.body.appendChild(status);
             }
+
+            // Show MediaPipe raw data count
+            const rawCount = STATE.handsData ? STATE.handsData.length : 0;
+
             if (handCount === 0) {
                 status.textContent = '👆 手を見せてね';
                 status.style.background = 'rgba(255,100,100,0.8)';
                 status.style.color = '#fff';
             } else if (handCount === 1) {
-                status.textContent = '✋ 手を検出中 (1)';
+                status.textContent = `✋ 手を検出中 (${handCount}) [Raw: ${rawCount}]`;
                 status.style.background = 'rgba(0,255,0,0.8)';
                 status.style.color = '#000';
             } else {
-                status.textContent = '✋✋ 両手を検出中! (2)';
+                status.textContent = `✋✋ 両手を検出中! (${handCount}) [Raw: ${rawCount}]`;
                 status.style.background = 'rgba(0,255,255,0.8)';
                 status.style.color = '#000';
             }
