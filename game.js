@@ -1025,7 +1025,13 @@
 
         function createTarget(number, isAnswer, isStrategy) {
             const target = getTarget();
-            if (!target) return null;
+            if (!target) {
+                console.error('[ERROR] getTarget() returned null! Pool exhausted. Pool size:', STATE.targetPool.length);
+                // Count how many are visible
+                const visibleCount = STATE.targetPool.filter(t => t.visible).length;
+                console.error('[ERROR] Visible targets in pool:', visibleCount, '/', STATE.targetPool.length);
+                return null;
+            }
 
             // Random color - NO HINTS about which is correct!
             const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
@@ -1085,8 +1091,8 @@
         }
 
         function spawnTargets() {
-            // Release old targets (preserve sprite reference)
-            STATE.targets.forEach(t => {
+            // CRITICAL FIX: Release ALL targets in the pool, not just active ones
+            STATE.targetPool.forEach(t => {
                 t.visible = false;
                 const sprite = t.userData.sprite;
                 t.userData = { sprite };  // Keep sprite reference
@@ -1135,6 +1141,9 @@
             });
 
             console.log('[DEBUG] Total balloons created:', STATE.targets.length, '(answer + ' + created + ' others)');
+
+            // Update debug display with creation status
+            debugDiv.innerHTML += `<div style="color: ${STATE.targets.length > 0 ? '#0f0' : '#f00'};">風船数: ${STATE.targets.length}</div>`;
         }
 
         function updateTargets(deltaTime) {
