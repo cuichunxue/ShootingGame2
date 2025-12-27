@@ -93,7 +93,7 @@
             TIME_LIMIT: 90,  // More time per stage
             SCORE_CORRECT: 100,
             SCORE_SMART: 50,
-            PENALTY_WRONG: 20,
+            PENALTY_WRONG: 50,
             CROSSHAIR_LERP: 0.35,
             DETECTION_FPS: 25
         };
@@ -1668,15 +1668,15 @@
                 }
 
                 STATE.player.score = Math.max(0, STATE.player.score - CONFIG.PENALTY_WRONG);
-                STATE.player.streak = Math.max(0, STATE.player.streak - 1);
+                STATE.player.streak = 0;  // Reset streak completely on wrong answer
 
-                showFeedback(`-${CONFIG.PENALTY_WRONG}`, '#ff4444');
-                showFloatingScore(hitPosition, `-${CONFIG.PENALTY_WRONG}`, '#ff4444');
+                showFeedback(`WRONG! -${CONFIG.PENALTY_WRONG}`, '#ff0000');
+                showFloatingScore(hitPosition, `-${CONFIG.PENALTY_WRONG}`, '#ff0000');
                 playSFX('wrong');
 
-                // VFX: Red flash for wrong answer
-                triggerScreenShake(0.5);
-                triggerBgFlash(0x3a0a0a);  // Red flash
+                // VFX: Stronger red flash for wrong answer
+                triggerScreenShake(0.8);
+                triggerBgFlash(0x4a0a0a);  // Stronger red flash
 
                 // Reset streak fire
                 const scoreEl = document.getElementById('playerScore');
