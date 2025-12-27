@@ -730,9 +730,11 @@
         function getNumberTexture(number) {
             const key = String(number);
             if (STATE.textureCache.has(key)) {
+                console.log(`[TEXTURE] Using cached texture for: ${key}`);
                 return STATE.textureCache.get(key);
             }
 
+            console.log(`[TEXTURE] Creating NEW texture for: ${key}`);
             const canvas = document.createElement('canvas');
             canvas.width = 256;
             canvas.height = 256;
@@ -761,8 +763,10 @@
 
             const texture = new THREE.CanvasTexture(canvas);
             texture.minFilter = THREE.LinearFilter;
+            texture.needsUpdate = true;  // Force texture update
             STATE.textureCache.set(key, texture);
 
+            console.log(`[TEXTURE] Texture created successfully for ${key}, size: ${canvas.width}x${canvas.height}`);
             return texture;
         }
 
@@ -1046,13 +1050,23 @@
 
             target.position.set(x, height, z);
 
+            // CRITICAL: Restore balloon scale FIRST before working with sprite
+            target.visible = true;
+            target.scale.set(1.0, 1.2, 1.0);  // Restore balloon size
+
             // OPTIMIZED: Use cached texture
             const sprite = target.userData.sprite;
-            sprite.material.map = getNumberTexture(number);
-            sprite.material.needsUpdate = true;
+            const texture = getNumberTexture(number);
+            sprite.material.map = texture;
+            sprite.material.opacity = 1.0;  // Ensure full opacity
+            sprite.material.transparent = true;  // Ensure transparency is enabled
+            sprite.material.needsUpdate = true;  // Force material update
             sprite.position.set(0, 0.2, 1.2);  // Position in front of balloon
             sprite.scale.set(2.0, 2.0, 1);  // Larger number
             sprite.visible = true;  // Make sprite visible
+
+            // Debug: Verify sprite setup
+            console.log(`[SPRITE DEBUG] Number: ${number}, Sprite visible: ${sprite.visible}, Texture exists: ${!!texture}, Opacity: ${sprite.material.opacity}, Scale: (${sprite.scale.x}, ${sprite.scale.y}), Parent scale: (${target.scale.x}, ${target.scale.y}, ${target.scale.z})`);
 
             // Speed variation: 30% chance of faster balloon
             const speedMultiplier = Math.random() < 0.3 ? 1.8 : 1.0;
@@ -1071,8 +1085,6 @@
                 speedMultiplier  // Store for visual effect
             };
 
-            target.visible = true;
-            target.scale.set(1.0, 1.2, 1.0);  // Bigger balloons
             STATE.targets.push(target);
 
             return target;
@@ -1185,6 +1197,14 @@
 
             STATE.targets.forEach(target => {
                 if (!target.visible || !target.userData.velocity) return;
+
+                // SPRITE DEBUG: Verify sprite state every frame (first target only to avoid spam)
+                if (STATE.targets.indexOf(target) === 0 && target.userData.sprite) {
+                    const sprite = target.userData.sprite;
+                    if (!sprite.visible || !sprite.material.map) {
+                        console.warn(`[SPRITE WARN] Frame issue - Number: ${target.userData.number}, Sprite visible: ${sprite.visible}, Has texture: ${!!sprite.material.map}`);
+                    }
+                }
 
                 target.position.add(target.userData.velocity);
                 target.rotation.y += 0.012;
