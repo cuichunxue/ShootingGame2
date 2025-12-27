@@ -838,17 +838,17 @@ const GRADE_CURRICULUMS = {
                     return { question: `${a}:${b} = ${a * mult}:?`, answer: b * mult, strategy: [], hint: `×${mult}` };
                 }
             },
-            // 比の値
+            // 比の値（小数2桁に丸める）
             {
                 type: 'ratio_value',
                 category: 'ratio',
                 skillLevel: 1,
                 generate: () => {
-                    const denoms = [2, 3, 4, 5];
+                    const denoms = [2, 4, 5, 10];  // きれいな小数になる分母
                     const denom = denoms[Math.floor(Math.random() * denoms.length)];
                     const numer = 1 + Math.floor(Math.random() * (denom - 1));
-                    const answer = numer / denom;
-                    return { question: `${numer}:${denom} の比の値は? (小数で)`, answer, strategy: [], hint: `${numer}÷${denom}` };
+                    const answer = Math.round((numer / denom) * 100) / 100;  // 小数2桁に丸める
+                    return { question: `${numer}:${denom} の比の値は?`, answer, strategy: [], hint: `${numer}÷${denom}` };
                 }
             },
             // 速さ

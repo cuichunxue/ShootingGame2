@@ -1157,13 +1157,16 @@
 
             console.log('[DEBUG] Total balloons created:', STATE.targets.length, '(answer + ' + created + ' others)');
 
-            // Log all numbers in STATE.targets
+            // Log all numbers in STATE.targets with visibility
             const numbersInTargets = STATE.targets.map(t => t.userData.number);
+            const visibleBalloons = STATE.targets.filter(t => t.visible).map(t => t.userData.number);
             console.log('[DEBUG] Numbers in STATE.targets:', numbersInTargets);
+            console.log('[DEBUG] Actually visible:', visibleBalloons);
 
             // Update debug display with creation status
             debugDiv.innerHTML += `<div style="color: ${STATE.targets.length > 0 ? '#0f0' : '#f00'};">風船数: ${STATE.targets.length}</div>`;
             debugDiv.innerHTML += `<div style="color: #ff0;">実際: [${numbersInTargets.join(', ')}]</div>`;
+            debugDiv.innerHTML += `<div style="color: #0ff;">表示中: [${visibleBalloons.join(', ')}]</div>`;
         }
 
         function updateTargets(deltaTime) {
