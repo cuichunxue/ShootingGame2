@@ -8,13 +8,13 @@ const GRADE_CURRICULUMS = {
     1: {
         name: '1年生',
         description: 'たし算・ひき算の基礎',
-        emoji: '🌱',
+        emoji: '',
         categories: {
             addition: { level: 1, correct: 0, total: 0 },
             subtraction: { level: 1, correct: 0, total: 0 }
         },
         templates: [
-            // たし算 (1桁 + 1桁) - 絵文字で楽しく
+            // たし算 (1桁 + 1桁)
             {
                 type: 'addition_1digit',
                 category: 'addition',
@@ -22,10 +22,8 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 1 + Math.floor(Math.random() * 9);
                     const b = 1 + Math.floor(Math.random() * (10 - a));
-                    const emojis = ['🍎', '🍊', '🍌', '🍇', '🍓', '⚽', '🎈', '⭐', '🌸', '🦋'];
-                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
                     return {
-                        question: `${emoji} ${a} + ${b}`,
+                        question: `${a} + ${b}`,
                         answer: a + b,
                         strategy: [],
                         hint: ''
@@ -41,7 +39,7 @@ const GRADE_CURRICULUMS = {
                     const a = 6 + Math.floor(Math.random() * 4);
                     const toTen = 10 - a;
                     return {
-                        question: `💡 ${a} + ${toTen}`,
+                        question: `${a} + ${toTen}`,
                         answer: 10,
                         strategy: [10],
                         hint: `${a}と${toTen}で10！`
@@ -59,7 +57,7 @@ const GRADE_CURRICULUMS = {
                     const toTen = 10 - a;
                     const remain = b - toTen;
                     return {
-                        question: `🎯 ${a} + ${b}`,
+                        question: `${a} + ${b}`,
                         answer: a + b,
                         strategy: [10, 10 + remain],
                         hint: `${a}+${toTen}=10、10+${remain}`
@@ -74,7 +72,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 5 + Math.floor(Math.random() * 5);
                     const b = 1 + Math.floor(Math.random() * a);
-                    const items = ['🍪クッキー', '🍬あめ', '🎁プレゼント', '📚本'];
+                    const items = ['クッキー', 'あめ', 'プレゼント', '本'];
                     const item = items[Math.floor(Math.random() * items.length)];
                     return {
                         question: `${item}${a}個−${b}個`,
@@ -93,7 +91,7 @@ const GRADE_CURRICULUMS = {
                     const b = 1 + Math.floor(Math.random() * 9);
                     const ans = 10 - b;
                     return {
-                        question: `🔟 10 − ${b}`,
+                        question: `10 − ${b}`,
                         answer: ans,
                         strategy: [ans],
                         hint: `${b}と${ans}で10！`
@@ -112,7 +110,7 @@ const GRADE_CURRICULUMS = {
                     const tens = Math.floor(a / 10) * 10;
                     const ones = a % 10;
                     return {
-                        question: `🎲 ${a} − ${b}`,
+                        question: `${a} − ${b}`,
                         answer: a - b,
                         strategy: [tens, 10 - b + ones],
                         hint: `10から${b}をひいて、${ones}をたす`
@@ -128,7 +126,7 @@ const GRADE_CURRICULUMS = {
                     const a = Math.floor(Math.random() * 5) + 1;
                     const b = Math.floor(Math.random() * 5) + 1;
                     return {
-                        question: `💰 ${a}円+${b}円`,
+                        question: `${a}円+${b}円`,
                         answer: a + b,
                         strategy: [],
                         hint: ''
@@ -144,7 +142,7 @@ const GRADE_CURRICULUMS = {
     2: {
         name: '2年生',
         description: '九九と3桁の計算',
-        emoji: '🌿',
+        emoji: '',
         categories: {
             addition: { level: 2, correct: 0, total: 0 },
             subtraction: { level: 2, correct: 0, total: 0 },
@@ -162,7 +160,7 @@ const GRADE_CURRICULUMS = {
                     const price = prices[Math.floor(Math.random() * prices.length)];
                     const paid = 100;
                     return {
-                        question: `💴 100円で${price}円のおかし、おつりは？`,
+                        question: `100円で${price}円のおかし、おつりは？`,
                         answer: paid - price,
                         strategy: [100 - price],
                         hint: ''
@@ -180,7 +178,7 @@ const GRADE_CURRICULUMS = {
                     const roundA = Math.round(a / 10) * 10;
                     const diff = a - roundA;
                     return {
-                        question: `🧮 ${a} + ${b}`,
+                        question: `${a} + ${b}`,
                         answer: a + b,
                         strategy: [roundA, roundA + b, roundA + b + diff],
                         hint: `${a}≒${roundA}で計算`
@@ -197,14 +195,14 @@ const GRADE_CURRICULUMS = {
                     const b = 50 + Math.floor(Math.random() * 200);
                     const hundreds = Math.floor((a + b) / 100) * 100;
                     return {
-                        question: `🎯 ${a} + ${b}`,
+                        question: `${a} + ${b}`,
                         answer: a + b,
                         strategy: [hundreds],
                         hint: ''
                     };
                 }
             },
-            // 九九 (簡単) - 絵文字で楽しく
+            // 九九 (簡単)
             {
                 type: 'multiplication_easy',
                 category: 'multiplication',
@@ -213,15 +211,8 @@ const GRADE_CURRICULUMS = {
                     const tables = [2, 3, 4, 5];
                     const a = tables[Math.floor(Math.random() * tables.length)];
                     const b = 1 + Math.floor(Math.random() * 9);
-                    const contexts = [
-                        { emoji: '🍎', item: 'りんご' },
-                        { emoji: '🍪', item: 'クッキー' },
-                        { emoji: '⚽', item: 'ボール' },
-                        { emoji: '📚', item: '本' }
-                    ];
-                    const ctx = contexts[Math.floor(Math.random() * contexts.length)];
                     return {
-                        question: `${ctx.emoji} ${a}×${b}`,
+                        question: `${a}×${b}`,
                         answer: a * b,
                         strategy: [],
                         hint: `${a}の段！`
@@ -238,7 +229,7 @@ const GRADE_CURRICULUMS = {
                     const a = hard[Math.floor(Math.random() * hard.length)];
                     const b = 6 + Math.floor(Math.random() * 4);  // 6〜9
                     return {
-                        question: `💪 ${a} × ${b}`,
+                        question: `${a} × ${b}`,
                         answer: a * b,
                         strategy: [(a * 5), (a * 5) + (a * (b - 5))],
                         hint: `${a}×5=${a * 5}から考える`
@@ -253,7 +244,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const m = 1 + Math.floor(Math.random() * 5);
                     return {
-                        question: `📏 ${m}m = ?cm`,
+                        question: `${m}m = ?cm`,
                         answer: m * 100,
                         strategy: [100, m * 100],
                         hint: ''
@@ -271,7 +262,7 @@ const GRADE_CURRICULUMS = {
                     const s = start[Math.floor(Math.random() * start.length)];
                     const d = duration[Math.floor(Math.random() * duration.length)];
                     return {
-                        question: `⏰ ${s}分+${d}分`,
+                        question: `${s}分+${d}分`,
                         answer: s + d,
                         strategy: [],
                         hint: ''
@@ -285,10 +276,10 @@ const GRADE_CURRICULUMS = {
                 skillLevel: 2,
                 generate: () => {
                     const items = [
-                        { name: '🍫チョコ', price: 80 },
-                        { name: '🍬あめ', price: 50 },
-                        { name: '🍪クッキー', price: 120 },
-                        { name: '🧃ジュース', price: 100 }
+                        { name: 'チョコ', price: 80 },
+                        { name: 'あめ', price: 50 },
+                        { name: 'クッキー', price: 120 },
+                        { name: 'ジュース', price: 100 }
                     ];
                     const item1 = items[Math.floor(Math.random() * items.length)];
                     let item2 = items[Math.floor(Math.random() * items.length)];
@@ -297,7 +288,7 @@ const GRADE_CURRICULUMS = {
                     }
                     const total = item1.price + item2.price;
                     return {
-                        question: `🛒 ${item1.name}${item1.price}円と${item2.name}${item2.price}円`,
+                        question: `${item1.name}${item1.price}円と${item2.name}${item2.price}円`,
                         answer: total,
                         strategy: [Math.round(total / 10) * 10],
                         hint: ''
@@ -314,7 +305,7 @@ const GRADE_CURRICULUMS = {
                     const b = 2 + Math.floor(Math.random() * 7);  // 2-8
                     const answer = a * b;
                     return {
-                        question: `❓ ${answer} ÷ ${a}`,
+                        question: `${answer} ÷ ${a}`,
                         answer: b,
                         strategy: [a * b],
                         hint: `${a}×?=${answer}`
@@ -330,7 +321,7 @@ const GRADE_CURRICULUMS = {
     3: {
         name: '3年生',
         description: 'かけ算・わり算と小数',
-        emoji: '🌳',
+        emoji: '',
         categories: {
             addition: { level: 3, correct: 0, total: 0 },
             subtraction: { level: 3, correct: 0, total: 0 },
@@ -348,7 +339,7 @@ const GRADE_CURRICULUMS = {
                     const b = 12 + Math.floor(Math.random() * 17);  // 12-28
                     const trick = b * 10;
                     return {
-                        question: `💡 ${b} × 5`,
+                        question: `${b} × 5`,
                         answer: b * 5,
                         strategy: [trick, trick / 2],
                         hint: `${b}×10=${trick}の半分！`
@@ -363,7 +354,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const b = 11 + Math.floor(Math.random() * 9);  // 11-19
                     return {
-                        question: `🎯 ${b} × 9`,
+                        question: `${b} × 9`,
                         answer: b * 9,
                         strategy: [b * 10, b * 10 - b],
                         hint: `${b}×10=${b * 10}から${b}を引く`
@@ -381,7 +372,7 @@ const GRADE_CURRICULUMS = {
                     const tens = Math.floor(a / 10) * 10;
                     const ones = a % 10;
                     return {
-                        question: `📐 ${a} × ${b}`,
+                        question: `${a} × ${b}`,
                         answer: a * b,
                         strategy: [tens * b, ones * b, tens * b + ones * b],
                         hint: `${tens}×${b}+${ones}×${b}`
@@ -397,10 +388,8 @@ const GRADE_CURRICULUMS = {
                     const people = 3 + Math.floor(Math.random() * 6);  // 3-8人
                     const each = 4 + Math.floor(Math.random() * 7);     // 4-10個
                     const total = people * each;
-                    const emojis = ['🍎', '🍬', '⚽', '📚', '🍪'];
-                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
                     return {
-                        question: `${emoji}${total}個÷${people}人`,
+                        question: `${total}個÷${people}人`,
                         answer: each,
                         strategy: [people * each],
                         hint: ''
@@ -418,7 +407,7 @@ const GRADE_CURRICULUMS = {
                     const remainder = 1 + Math.floor(Math.random() * (divisor - 1));
                     const dividend = divisor * quotient + remainder;
                     return {
-                        question: `🎲 ${dividend} ÷ ${divisor}...あまり?`,
+                        question: `${dividend} ÷ ${divisor}...あまり?`,
                         answer: remainder,
                         strategy: [divisor * quotient],
                         hint: `${divisor}×${quotient}=${divisor * quotient}`
@@ -432,14 +421,14 @@ const GRADE_CURRICULUMS = {
                 skillLevel: 1,
                 generate: () => {
                     const items = [
-                        { name: '🍎りんご', weight: 200 },
-                        { name: '📚本', weight: 500 },
-                        { name: '⚽ボール', weight: 400 }
+                        { name: 'りんご', weight: 200 },
+                        { name: '本', weight: 500 },
+                        { name: 'ボール', weight: 400 }
                     ];
                     const item = items[Math.floor(Math.random() * items.length)];
                     const count = 2 + Math.floor(Math.random() * 4);  // 2-5個
                     return {
-                        question: `⚖️ ${item.name}${item.weight}g×${count}個`,
+                        question: `${item.name}${item.weight}g×${count}個`,
                         answer: item.weight * count,
                         strategy: [item.weight * count],
                         hint: ''
@@ -455,7 +444,7 @@ const GRADE_CURRICULUMS = {
                     const a = 50 + Math.floor(Math.random() * 150);  // 50-199cm
                     const b = 30 + Math.floor(Math.random() * 100);  // 30-129cm
                     return {
-                        question: `📏 ${a}cm+${b}cm=?m`,
+                        question: `${a}cm+${b}cm=?m`,
                         answer: Math.floor((a + b) / 100),
                         strategy: [a + b],
                         hint: ''
@@ -472,7 +461,7 @@ const GRADE_CURRICULUMS = {
                     const p = price[Math.floor(Math.random() * price.length)];
                     const count = 3 + Math.floor(Math.random() * 5);  // 3-7個
                     return {
-                        question: `🛒 ${p}円×${count}個`,
+                        question: `${p}円×${count}個`,
                         answer: p * count,
                         strategy: [p * count],
                         hint: ''
@@ -488,7 +477,7 @@ const GRADE_CURRICULUMS = {
                     const start = 8 + Math.floor(Math.random() * 3);  // 8-10時
                     const end = 12 + Math.floor(Math.random() * 3);   // 12-14時
                     return {
-                        question: `🕐 ${start}時〜${end}時`,
+                        question: `${start}時〜${end}時`,
                         answer: end - start,
                         strategy: [end - start],
                         hint: ''
@@ -504,7 +493,7 @@ const GRADE_CURRICULUMS = {
     4: {
         name: '4年生',
         description: '小数・分数と面積',
-        emoji: '🌲',
+        emoji: '',
         categories: {
             addition: { level: 4, correct: 0, total: 0 },
             subtraction: { level: 4, correct: 0, total: 0 },
@@ -522,7 +511,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const n = 4 + Math.floor(Math.random() * 21);  // 4-24
                     return {
-                        question: `💡 ${n} × 25`,
+                        question: `${n} × 25`,
                         answer: n * 25,
                         strategy: [n * 100, n * 100 / 4],
                         hint: ''
@@ -538,7 +527,7 @@ const GRADE_CURRICULUMS = {
                     const a = 11 + Math.floor(Math.random() * 19);
                     const b = 11 + Math.floor(Math.random() * 19);
                     return {
-                        question: `🧮 ${a} × ${b}`,
+                        question: `${a} × ${b}`,
                         answer: a * b,
                         strategy: [Math.floor(a / 10) * 10 * b, (a % 10) * b],
                         hint: ''
@@ -556,7 +545,7 @@ const GRADE_CURRICULUMS = {
                     const p2 = prices[Math.floor(Math.random() * prices.length)];
                     const total = Math.round((p1 + p2) * 10) / 10;
                     return {
-                        question: `🛒 ${p1}kg+${p2}kg`,
+                        question: `${p1}kg+${p2}kg`,
                         answer: total,
                         strategy: [],
                         hint: ''
@@ -573,7 +562,7 @@ const GRADE_CURRICULUMS = {
                     const each = 5 + Math.floor(Math.random() * 10);     // 5-14
                     const total = people * each;
                     return {
-                        question: `🎁 ${total}個÷${people}人`,
+                        question: `${total}個÷${people}人`,
                         answer: each,
                         strategy: [people * each],
                         hint: ''
@@ -589,7 +578,7 @@ const GRADE_CURRICULUMS = {
                     const w = 3 + Math.floor(Math.random() * 5);   // 3-7m
                     const h = 4 + Math.floor(Math.random() * 5);   // 4-8m
                     return {
-                        question: `🏠 部屋：縦${h}m×横${w}m`,
+                        question: `部屋：縦${h}m×横${w}m`,
                         answer: w * h,
                         strategy: [w * h],
                         hint: ''
@@ -606,7 +595,7 @@ const GRADE_CURRICULUMS = {
                     const mult = 3 + Math.floor(Math.random() * 7);  // 3-9
                     const answer = Math.round(decimal * mult * 10) / 10;
                     return {
-                        question: `📐 ${decimal.toFixed(1)} × ${mult}`,
+                        question: `${decimal.toFixed(1)} × ${mult}`,
                         answer,
                         strategy: [Math.floor(decimal) * mult, Math.round((decimal % 1) * mult * 10) / 10],
                         hint: ''
@@ -623,7 +612,7 @@ const GRADE_CURRICULUMS = {
                     const time = 2 + Math.floor(Math.random() * 4);  // 2-5時間
                     const distance = speed * time;
                     return {
-                        question: `🚗 ${distance}km÷${time}時間`,
+                        question: `${distance}km÷${time}時間`,
                         answer: speed,
                         strategy: [speed * time],
                         hint: ''
@@ -638,7 +627,7 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const side = 8 + Math.floor(Math.random() * 9);  // 8-16
                     return {
-                        question: `🟦 正方形タイル：1辺${side}cm`,
+                        question: `正方形タイル：1辺${side}cm`,
                         answer: side * side,
                         strategy: [side * side],
                         hint: ''
@@ -654,7 +643,7 @@ const GRADE_CURRICULUMS = {
     5: {
         name: '5年生',
         description: '分数と体積',
-        emoji: '🏔️',
+        emoji: '',
         categories: {
             multiplication: { level: 4, correct: 0, total: 0 },
             division: { level: 3, correct: 0, total: 0 },
@@ -784,7 +773,7 @@ const GRADE_CURRICULUMS = {
     6: {
         name: '6年生',
         description: '分数の計算と比・速さ',
-        emoji: '🎓',
+        emoji: '',
         categories: {
             multiplication: { level: 5, correct: 0, total: 0 },
             division: { level: 4, correct: 0, total: 0 },
