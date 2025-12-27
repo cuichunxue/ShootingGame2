@@ -158,15 +158,6 @@
     </style>
 </head>
 <body>
-    <!-- 戻るボタン -->
-    <button class="back-btn" onclick="goBack()">← 学年選択に戻る</button>
-
-    <!-- 学年情報表示 -->
-    <div class="game-info" id="gameInfo">
-        <div class="grade-badge" id="gradeBadge"></div>
-        <div id="gradeText"></div>
-    </div>
-
     <!-- ゲームキャンバス -->
     <canvas id="gameCanvas"></canvas>
     <video id="hiddenVideo" playsinline autoplay></video>
@@ -232,6 +223,9 @@
         </div>
     </div>
 
+    <!-- 戻るボタン（右下） -->
+    <button class="back-btn-bottom" onclick="goBack()">← 戻る</button>
+
     <!-- 外部ライブラリ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
@@ -254,10 +248,10 @@
             const curriculum = GRADE_CURRICULUMS[selectedGrade];
 
             if (curriculum) {
-                document.getElementById('gradeBadge').textContent = curriculum.emoji;
-                document.getElementById('gradeText').textContent = curriculum.name;
-                document.getElementById('welcomeText').textContent =
-                    `${curriculum.name}の問題に挑戦しよう！ ${curriculum.description}`;
+                const welcomeText = document.getElementById('welcomeText');
+                if (welcomeText) {
+                    welcomeText.textContent = `${curriculum.name}の問題に挑戦しよう！ ${curriculum.description}`;
+                }
             }
         }
 
