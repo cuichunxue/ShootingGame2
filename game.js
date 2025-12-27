@@ -1064,10 +1064,17 @@
 
             const { answer, strategy, allNumbers } = STATE.currentQuestion;
 
+            // IMPORTANT: Create answer balloon first to guarantee it exists
+            const answerTarget = createTarget(answer, true, false);
+            if (!answerTarget) {
+                console.error('Failed to create answer target!');
+            }
+
+            // Then create other targets
             allNumbers.forEach(num => {
-                const isAnswer = num === answer;
-                const isStrategy = strategy.includes(num) && !isAnswer;
-                createTarget(num, isAnswer, isStrategy);
+                if (num === answer) return;  // Skip answer, already created
+                const isStrategy = strategy.includes(num);
+                createTarget(num, false, isStrategy);
             });
         }
 
@@ -1587,6 +1594,14 @@
             createExplosion(hitPosition, isAnswer ? 0x4CAF50 : isStrategy ? 0xFFD700 : 0xff4444);
 
             if (isAnswer) {
+                // Immediately hide all other targets for instant question change
+                STATE.targets.forEach(t => {
+                    if (t !== target && t.visible) {
+                        t.visible = false;
+                    }
+                });
+                STATE.targets = STATE.targets.filter(t => t === target);
+
                 // Update skill - correct answer!
                 if (STATE.currentQuestion && STATE.currentQuestion.questionType) {
                     updateSkill(STATE.currentQuestion.questionType, true);
@@ -2094,12 +2109,21 @@
             // Get wrong numbers (exclude the answer)
             const wrongNumbers = q.allNumbers.filter(n => n !== q.answer);
 
+            // IMPORTANT: Create answer target first
+            let answerCreated = false;
+
             for (let i = 0; i < targetCount; i++) {
                 const target = getTarget();
-                if (!target) continue;
+                if (!target) {
+                    if (!answerCreated) {
+                        console.error('Failed to create answer target in rapid fire!');
+                    }
+                    continue;
+                }
 
                 // First target is the correct answer, rest are wrong
                 const isCorrect = (i === 0);
+                if (isCorrect) answerCreated = true;
                 const number = isCorrect ? q.answer : wrongNumbers[i % wrongNumbers.length];
 
                 const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
@@ -2240,17 +2264,24 @@
             // Get wrong numbers
             const wrongNumbers = q.allNumbers.filter(n => n !== q.answer);
 
-            for (let i = 0; i < totalCount; i++) {
-                // First one is correct, rest are wrong
-                const isCorrect = (i === 0);
-                const number = isCorrect ? q.answer : wrongNumbers[i % wrongNumbers.length];
-                spawnFrenzyTarget(number, isCorrect);
+            // IMPORTANT: Create answer target first
+            spawnFrenzyTarget(q.answer, true);
+
+            for (let i = 1; i < totalCount; i++) {
+                // All others are wrong
+                const number = wrongNumbers[i % wrongNumbers.length];
+                spawnFrenzyTarget(number, false);
             }
         }
 
         function spawnFrenzyTarget(number, isCorrect) {
             const target = getTarget();
-            if (!target) return;
+            if (!target) {
+                if (isCorrect) {
+                    console.error('Failed to create answer target in frenzy!');
+                }
+                return;
+            }
 
             const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
             target.material.color.setHex(color);
