@@ -1666,6 +1666,9 @@
         function handleHit(target) {
             const { isAnswer, isStrategy, number, isBoss } = target.userData;
 
+            // DEBUG: Log hit information
+            console.log(`[HIT] Number: ${number}, isAnswer: ${isAnswer}, isStrategy: ${isStrategy}, Current Answer: ${STATE.currentQuestion?.answer}`);
+
             // Store position before hiding
             const hitPosition = target.position.clone();
 
