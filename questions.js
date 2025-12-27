@@ -1,6 +1,47 @@
 // 学年別問題データ - 日本の小学校算数カリキュラムに基づく
 // 各学年のカリキュラムに沿った問題テンプレートを提供
 
+// ============================================
+// 分数計算用ヘルパー関数
+// ============================================
+function gcd(a, b) {
+    // 最大公約数を計算
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+function lcm(a, b) {
+    // 最小公倍数を計算
+    return Math.abs(a * b) / gcd(a, b);
+}
+
+function simplifyFraction(numer, denom) {
+    // 分数を約分
+    const divisor = gcd(numer, denom);
+    return {
+        numer: numer / divisor,
+        denom: denom / divisor
+    };
+}
+
+function fractionToString(numer, denom) {
+    // 分数を文字列に変換（約分済み）
+    const simplified = simplifyFraction(numer, denom);
+    if (simplified.denom === 1) {
+        return String(simplified.numer);  // 整数の場合
+    }
+    return `${simplified.numer}/${simplified.denom}`;
+}
+
+// ============================================
+// 学年別カリキュラム定義
+// ============================================
 const GRADE_CURRICULUMS = {
     // ========================================
     // 1年生: 1〜100の数、たし算・ひき算
@@ -712,7 +753,8 @@ const GRADE_CURRICULUMS = {
                     const denom = 5 + Math.floor(Math.random() * 5);
                     const a = 1 + Math.floor(Math.random() * (denom - 2));
                     const b = 1 + Math.floor(Math.random() * (denom - a - 1));
-                    return { question: `${a}/${denom} + ${b}/${denom}`, answer: a + b, strategy: [], hint: '' };
+                    const answer = fractionToString(a + b, denom);
+                    return { question: `${a}/${denom} + ${b}/${denom}`, answer, strategy: [], hint: '' };
                 }
             },
             // 分数のひき算 (同分母)
@@ -724,7 +766,8 @@ const GRADE_CURRICULUMS = {
                     const denom = 5 + Math.floor(Math.random() * 5);
                     const a = 3 + Math.floor(Math.random() * (denom - 3));
                     const b = 1 + Math.floor(Math.random() * (a - 1));
-                    return { question: `${a}/${denom} − ${b}/${denom}`, answer: a - b, strategy: [], hint: '' };
+                    const answer = fractionToString(a - b, denom);
+                    return { question: `${a}/${denom} − ${b}/${denom}`, answer, strategy: [], hint: '' };
                 }
             },
             // 体積 (直方体)
@@ -793,7 +836,8 @@ const GRADE_CURRICULUMS = {
                     const numer = 1 + Math.floor(Math.random() * (denom - 1));
                     const mult = 2 + Math.floor(Math.random() * 5);
                     const answerNumer = numer * mult;
-                    return { question: `${numer}/${denom} × ${mult}`, answer: answerNumer, strategy: [], hint: '' };
+                    const answer = fractionToString(answerNumer, denom);
+                    return { question: `${numer}/${denom} × ${mult}`, answer, strategy: [], hint: '' };
                 }
             },
             // 分数÷整数
@@ -805,8 +849,9 @@ const GRADE_CURRICULUMS = {
                     const div = 2 + Math.floor(Math.random() * 4);
                     const numer = div * (1 + Math.floor(Math.random() * 5));
                     const denom = 3 + Math.floor(Math.random() * 7);
-                    const answerNumer = numer / div;
-                    return { question: `${numer}/${denom} ÷ ${div}`, answer: answerNumer, strategy: [], hint: '' };
+                    // 分数÷整数 = 分子そのまま、分母×整数
+                    const answer = fractionToString(numer, denom * div);
+                    return { question: `${numer}/${denom} ÷ ${div}`, answer, strategy: [], hint: '' };
                 }
             },
             // 分数のたし算 (異分母)
@@ -821,9 +866,14 @@ const GRADE_CURRICULUMS = {
                     const denom2 = pair[1];
                     const numer1 = 1;
                     const numer2 = 1;
-                    const lcm = denom2; // simplified for these pairs
-                    const answer = Math.round((numer1 * (lcm / denom1) + numer2 * (lcm / denom2)));
-                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: [lcm], hint: '' };
+
+                    // 正しく最小公倍数を計算
+                    const commonDenom = lcm(denom1, denom2);
+                    // 通分して加算
+                    const answerNumer = numer1 * (commonDenom / denom1) + numer2 * (commonDenom / denom2);
+                    const answer = fractionToString(answerNumer, commonDenom);
+
+                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: [commonDenom], hint: '' };
                 }
             },
             // 比
