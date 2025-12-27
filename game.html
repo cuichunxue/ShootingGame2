@@ -117,6 +117,16 @@
         </div>
     </div>
 
+    <!-- エラーオーバーレイ -->
+    <div id="errorOverlay" class="overlay hidden">
+        <h1>エラー</h1>
+        <p id="errorMessage" style="color: #ff4444; margin: 2rem 0;">エラーが発生しました</p>
+        <div class="btn-group">
+            <button class="btn" onclick="location.reload()">再読み込み</button>
+            <button class="btn btn-secondary" onclick="goBack()">学年選択に戻る</button>
+        </div>
+    </div>
+
     <!-- 外部ライブラリ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>

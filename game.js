@@ -2680,7 +2680,10 @@
                 console.log('[requestStart] Starting initialization...');
 
                 // スタートオーバーレイを非表示
-                document.getElementById('startOverlay').classList.add('hidden');
+                const startOverlay = document.getElementById('startOverlay');
+                if (startOverlay) {
+                    startOverlay.classList.add('hidden');
+                }
 
                 // カメラと手認識を初期化
                 await initMediaPipe();
@@ -2692,11 +2695,15 @@
                 console.error('[requestStart] Failed:', error);
 
                 // エラーを表示
-                const overlay = document.getElementById('startOverlay');
-                overlay.classList.remove('hidden');
+                const startOverlay = document.getElementById('startOverlay');
+                if (startOverlay) {
+                    startOverlay.classList.remove('hidden');
+                }
 
                 const welcomeText = document.getElementById('welcomeText');
-                welcomeText.innerHTML = `<span style="color: #ff4444;">エラー: ${error.message}</span><br><small>カメラへのアクセスを許可してください</small>`;
+                if (welcomeText) {
+                    welcomeText.innerHTML = `<span style="color: #ff4444;">エラー: ${error.message}</span><br><small>カメラへのアクセスを許可してください</small>`;
+                }
             }
         }
 
@@ -2774,8 +2781,21 @@
 
             } catch (error) {
                 console.error('[Game] Fatal error:', error);
-                document.getElementById('errorMessage').textContent = error.message;
-                showOverlay('errorOverlay');
+
+                // エラーメッセージを表示
+                const errorMsg = document.getElementById('errorMessage');
+                if (errorMsg) {
+                    errorMsg.textContent = error.message;
+                    showOverlay('errorOverlay');
+                } else {
+                    // errorOverlayが存在しない場合はstartOverlayにエラーを表示
+                    const startOverlay = document.getElementById('startOverlay');
+                    const welcomeText = document.getElementById('welcomeText');
+                    if (startOverlay && welcomeText) {
+                        startOverlay.classList.remove('hidden');
+                        welcomeText.innerHTML = `<span style="color: #ff4444;">エラー: ${error.message}</span><br><small>ページを再読み込みしてください</small>`;
+                    }
+                }
             }
         }
 
