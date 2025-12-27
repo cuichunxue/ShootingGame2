@@ -2674,6 +2674,40 @@
         // ============================================
         // GAME LIFECYCLE
         // ============================================
+        // ユーザーがゲームスタートボタンを押したときに呼ばれる
+        async function requestStart() {
+            try {
+                console.log('[requestStart] Starting initialization...');
+
+                // スタートオーバーレイを非表示
+                document.getElementById('startOverlay').classList.add('hidden');
+
+                // カメラと手認識を初期化
+                await initMediaPipe();
+
+                // ゲームを開始
+                await startGame();
+
+            } catch (error) {
+                console.error('[requestStart] Failed:', error);
+
+                // エラーを表示
+                const overlay = document.getElementById('startOverlay');
+                overlay.classList.remove('hidden');
+
+                const welcomeText = document.getElementById('welcomeText');
+                welcomeText.innerHTML = `<span style="color: #ff4444;">エラー: ${error.message}</span><br><small>カメラへのアクセスを許可してください</small>`;
+            }
+        }
+
+        // ゲームを最初から再スタート
+        function restartGame() {
+            // すべてのオーバーレイを非表示
+            hideAllOverlays();
+            // ゲームを再開始
+            startGame();
+        }
+
         async function startGame() {
             try {
                 console.log('[Game] Starting...');
@@ -2772,8 +2806,8 @@
             // Setup audio unlock (browsers require user interaction)
             setupAudioUnlock();
 
-            // Auto-start
-            setTimeout(startGame, 50);
+            // 自動開始を無効化（ユーザーがゲームスタートボタンを押すのを待つ）
+            // setTimeout(startGame, 50);  // 削除：学年選択機能のため
         });
 
         // Prevent scroll/zoom
