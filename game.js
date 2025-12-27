@@ -2240,6 +2240,18 @@
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
+
+            // DEBUG: Update debug display for Rapid Fire mode
+            const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+            debugDiv.innerHTML = `
+                <div style="background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-size: 12px; font-family: monospace;">
+                    <div style="color: #f90;">🔥 RAPID FIRE MODE</div>
+                    <div>正解: ${q.answer}</div>
+                    <div>allNumbers: [${q.allNumbers.join(', ')}]</div>
+                    <div>strategy: [${q.strategy.join(', ')}]</div>
+                </div>
+            `;
+
             // Spawn 5-7 targets with ONLY ONE correct answer
             const targetCount = 5 + Math.floor(Math.random() * 3);
 
@@ -2412,6 +2424,18 @@
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
+
+            // DEBUG: Update debug display for Frenzy mode
+            const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+            debugDiv.innerHTML = `
+                <div style="background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-size: 12px; font-family: monospace;">
+                    <div style="color: #f0f;">🎯 FRENZY MODE</div>
+                    <div>正解: ${q.answer}</div>
+                    <div>allNumbers: [${q.allNumbers.join(', ')}]</div>
+                    <div>strategy: [${q.strategy.join(', ')}]</div>
+                </div>
+            `;
+
             // Spawn 8-10 targets, ONLY ONE is correct
             const totalCount = 8 + Math.floor(Math.random() * 3);
 
@@ -2503,6 +2527,17 @@
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
+
+            // DEBUG: Update debug display for Boss mode
+            const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+            debugDiv.innerHTML = `
+                <div style="background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-size: 12px; font-family: monospace;">
+                    <div style="color: #f00;">👹 BOSS MODE</div>
+                    <div>正解: ${q.answer}</div>
+                    <div>allNumbers: [${q.allNumbers.join(', ')}]</div>
+                    <div>strategy: [${q.strategy.join(', ')}]</div>
+                </div>
+            `;
 
             // Spawn boss (correct answer)
             const boss = getTarget();
