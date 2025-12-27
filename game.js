@@ -2189,8 +2189,15 @@
         }
 
         function spawnRapidFireTargets() {
-            // Clear existing
-            STATE.targets.forEach(t => t.visible = false);
+            // CRITICAL FIX: Aggressively hide ALL targets in the pool
+            STATE.targetPool.forEach(t => {
+                t.visible = false;
+                t.scale.set(0, 0, 0);
+                t.position.set(0, -100, 0);
+                const sprite = t.userData.sprite;
+                if (sprite) sprite.visible = false;
+                t.userData = { sprite };
+            });
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
@@ -2345,7 +2352,15 @@
         }
 
         function spawnFrenzyTargets() {
-            STATE.targets.forEach(t => t.visible = false);
+            // CRITICAL FIX: Aggressively hide ALL targets in the pool
+            STATE.targetPool.forEach(t => {
+                t.visible = false;
+                t.scale.set(0, 0, 0);
+                t.position.set(0, -100, 0);
+                const sprite = t.userData.sprite;
+                if (sprite) sprite.visible = false;
+                t.userData = { sprite };
+            });
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
@@ -2419,7 +2434,15 @@
         }
 
         function spawnBossWithMinions() {
-            STATE.targets.forEach(t => t.visible = false);
+            // CRITICAL FIX: Aggressively hide ALL targets in the pool
+            STATE.targetPool.forEach(t => {
+                t.visible = false;
+                t.scale.set(0, 0, 0);
+                t.position.set(0, -100, 0);
+                const sprite = t.userData.sprite;
+                if (sprite) sprite.visible = false;
+                t.userData = { sprite };
+            });
             STATE.targets = [];
 
             const q = STATE.currentQuestion;
