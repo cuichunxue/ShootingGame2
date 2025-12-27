@@ -264,8 +264,12 @@
 
             // Double-check: if answer somehow got removed, force it back at the start
             if (!uniqueNumbers.includes(q.answer)) {
+                console.warn('[WARN] Answer was missing from uniqueNumbers! Forcing it back.');
                 uniqueNumbers[0] = q.answer;  // Replace first element with answer
             }
+
+            // Debug: Log the final allNumbers array
+            console.log('[DEBUG] allNumbers:', uniqueNumbers, '| Answer:', q.answer);
 
             return { ...q, allNumbers: uniqueNumbers };
         }
@@ -1067,6 +1071,19 @@
             return target;
         }
 
+        function createDebugDiv() {
+            const div = document.createElement('div');
+            div.id = 'debugInfo';
+            div.style.position = 'fixed';
+            div.style.bottom = '80px';
+            div.style.left = '10px';
+            div.style.zIndex = '1000';
+            div.style.maxWidth = '90%';
+            div.style.fontSize = '11px';
+            document.body.appendChild(div);
+            return div;
+        }
+
         function spawnTargets() {
             // Release old targets (preserve sprite reference)
             STATE.targets.forEach(t => {
@@ -1080,18 +1097,44 @@
 
             const { answer, strategy, allNumbers } = STATE.currentQuestion;
 
+            // Debug logging
+            console.log('[DEBUG] spawnTargets - Answer:', answer, '| allNumbers:', allNumbers, '| strategy:', strategy);
+
+            // VISUAL DEBUG: Show on screen
+            const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+            debugDiv.innerHTML = `
+                <div style="background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-size: 12px; font-family: monospace;">
+                    <div>正解: ${answer}</div>
+                    <div>allNumbers: [${allNumbers.join(', ')}]</div>
+                    <div>strategy: [${strategy.join(', ')}]</div>
+                </div>
+            `;
+
             // IMPORTANT: Create answer balloon first to guarantee it exists
             const answerTarget = createTarget(answer, true, false);
             if (!answerTarget) {
-                console.error('Failed to create answer target!');
+                console.error('[ERROR] Failed to create answer target!');
+                debugDiv.innerHTML += `<div style="color: red;">ERROR: 正解風船の生成に失敗！</div>`;
+            } else {
+                console.log('[DEBUG] Answer balloon created successfully:', answer);
             }
 
             // Then create other targets
+            let created = 0;
             allNumbers.forEach(num => {
-                if (num === answer) return;  // Skip answer, already created
+                if (num === answer) {
+                    console.log('[DEBUG] Skipping answer in allNumbers:', num);
+                    return;  // Skip answer, already created
+                }
                 const isStrategy = strategy.includes(num);
-                createTarget(num, false, isStrategy);
+                const target = createTarget(num, false, isStrategy);
+                if (target) {
+                    created++;
+                    console.log('[DEBUG] Created balloon:', num, isStrategy ? '(strategy)' : '(distractor)');
+                }
             });
+
+            console.log('[DEBUG] Total balloons created:', STATE.targets.length, '(answer + ' + created + ' others)');
         }
 
         function updateTargets(deltaTime) {
