@@ -1070,16 +1070,22 @@
             target.visible = true;
             target.scale.set(1.0, 1.2, 1.0);  // Restore balloon size
 
-            // OPTIMIZED: Use cached texture
+            // Configure sprite with FORCED texture update
             const sprite = target.userData.sprite;
             const texture = getNumberTexture(number);
+
+            // CRITICAL: Force material reset to ensure texture updates
+            sprite.material.map = null;  // Clear old texture first
+            sprite.material.needsUpdate = true;
+
+            // Then set new texture
             sprite.material.map = texture;
-            sprite.material.opacity = 1.0;  // Ensure full opacity
-            sprite.material.transparent = true;  // Ensure transparency is enabled
-            sprite.material.needsUpdate = true;  // Force material update
-            sprite.position.set(0, 0.2, 1.2);  // Position in front of balloon
-            sprite.scale.set(2.0, 2.0, 1);  // Larger number
-            sprite.visible = true;  // Make sprite visible
+            sprite.material.opacity = 1.0;
+            sprite.material.transparent = true;
+            sprite.material.needsUpdate = true;
+            sprite.position.set(0, 0.2, 1.2);
+            sprite.scale.set(2.0, 2.0, 1);
+            sprite.visible = true;
 
             // Debug: Verify sprite setup
             console.log(`[SPRITE DEBUG] Number: ${number}, Sprite visible: ${sprite.visible}, Texture exists: ${!!texture}, Opacity: ${sprite.material.opacity}, Scale: (${sprite.scale.x}, ${sprite.scale.y}), Parent scale: (${target.scale.x}, ${target.scale.y}, ${target.scale.z})`);
@@ -2292,9 +2298,15 @@
                 target.visible = true;
                 target.scale.set(0.8, 1.0, 0.8);
 
-                // Configure sprite
+                // Configure sprite with FORCED texture update
                 const sprite = target.userData.sprite;
                 const texture = getNumberTexture(number);
+
+                // CRITICAL: Force material reset
+                sprite.material.map = null;
+                sprite.material.needsUpdate = true;
+
+                // Then set new texture
                 sprite.material.map = texture;
                 sprite.material.opacity = 1.0;
                 sprite.material.transparent = true;
@@ -2477,9 +2489,15 @@
             target.visible = true;
             target.scale.set(0.7, 0.85, 0.7);  // Small targets
 
-            // Configure sprite
+            // Configure sprite with FORCED texture update
             const sprite = target.userData.sprite;
             const texture = getNumberTexture(number);
+
+            // CRITICAL: Force material reset
+            sprite.material.map = null;
+            sprite.material.needsUpdate = true;
+
+            // Then set new texture
             sprite.material.map = texture;
             sprite.material.opacity = 1.0;
             sprite.material.transparent = true;
@@ -2554,9 +2572,15 @@
                 boss.visible = true;
                 boss.scale.set(2.2, 2.8, 2.2);
 
-                // Configure sprite
+                // Configure sprite with FORCED texture update
                 const sprite = boss.userData.sprite;
                 const texture = getNumberTexture(q.answer);
+
+                // CRITICAL: Force material reset
+                sprite.material.map = null;
+                sprite.material.needsUpdate = true;
+
+                // Then set new texture
                 sprite.material.map = texture;
                 sprite.material.opacity = 1.0;
                 sprite.material.transparent = true;
@@ -2596,9 +2620,15 @@
                 minion.visible = true;
                 minion.scale.set(1, 1.2, 1);
 
-                // Configure sprite
+                // Configure sprite with FORCED texture update
                 const sprite = minion.userData.sprite;
                 const texture = getNumberTexture(wrongNum);
+
+                // CRITICAL: Force material reset
+                sprite.material.map = null;
+                sprite.material.needsUpdate = true;
+
+                // Then set new texture
                 sprite.material.map = texture;
                 sprite.material.opacity = 1.0;
                 sprite.material.transparent = true;
