@@ -1117,12 +1117,19 @@
             `;
 
             // IMPORTANT: Create answer balloon first to guarantee it exists
+            console.log('[DEBUG] Attempting to create answer balloon:', answer);
+            const availableTargets = STATE.targetPool.filter(t => !t.visible).length;
+            console.log('[DEBUG] Available targets in pool before creation:', availableTargets);
+
             const answerTarget = createTarget(answer, true, false);
             if (!answerTarget) {
-                console.error('[ERROR] Failed to create answer target!');
-                debugDiv.innerHTML += `<div style="color: red;">ERROR: 正解風船の生成に失敗！</div>`;
+                console.error('[ERROR] Failed to create answer target! Answer:', answer);
+                debugDiv.innerHTML += `<div style="color: red;">ERROR: 正解風船の生成に失敗！答え=${answer}</div>`;
             } else {
                 console.log('[DEBUG] Answer balloon created successfully:', answer);
+                console.log('[DEBUG] Answer balloon position:', answerTarget.position.x, answerTarget.position.y, answerTarget.position.z);
+                console.log('[DEBUG] Answer balloon visible:', answerTarget.visible);
+                debugDiv.innerHTML += `<div style="color: #0ff;">正解風船: ${answer} ✓ (${Math.round(answerTarget.position.x)},${Math.round(answerTarget.position.y)})</div>`;
             }
 
             // Then create other targets
