@@ -1052,6 +1052,7 @@
             sprite.material.needsUpdate = true;
             sprite.position.set(0, 0.2, 1.2);  // Position in front of balloon
             sprite.scale.set(2.0, 2.0, 1);  // Larger number
+            sprite.visible = true;  // Make sprite visible
 
             // Speed variation: 30% chance of faster balloon
             const speedMultiplier = Math.random() < 0.3 ? 1.8 : 1.0;
@@ -1091,11 +1092,14 @@
         }
 
         function spawnTargets() {
-            // CRITICAL FIX: Release ALL targets in the pool, not just active ones
+            // CRITICAL FIX: Aggressively hide ALL targets in the pool
             STATE.targetPool.forEach(t => {
                 t.visible = false;
+                t.scale.set(0, 0, 0);  // Shrink to invisible
+                t.position.set(0, -100, 0);  // Move far away
                 const sprite = t.userData.sprite;
-                t.userData = { sprite };  // Keep sprite reference
+                if (sprite) sprite.visible = false;  // Hide sprite too
+                t.userData = { sprite };  // Clear user data except sprite
             });
             STATE.targets = [];
 
@@ -1105,6 +1109,10 @@
 
             // Debug logging
             console.log('[DEBUG] spawnTargets - Answer:', answer, '| allNumbers:', allNumbers, '| strategy:', strategy);
+
+            // Count actually visible targets in scene
+            const visibleInScene = STATE.targetPool.filter(t => t.visible).length;
+            console.log('[DEBUG] Visible targets in scene after cleanup:', visibleInScene);
 
             // VISUAL DEBUG: Show on screen
             const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
