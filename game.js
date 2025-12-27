@@ -1594,13 +1594,6 @@
             createExplosion(hitPosition, isAnswer ? 0x4CAF50 : isStrategy ? 0xFFD700 : 0xff4444);
 
             if (isAnswer) {
-                // Immediately hide all other targets for instant question change
-                STATE.targets.forEach(t => {
-                    if (t !== target) {
-                        t.visible = false;
-                    }
-                });
-
                 // Update skill - correct answer!
                 if (STATE.currentQuestion && STATE.currentQuestion.questionType) {
                     updateSkill(STATE.currentQuestion.questionType, true);
