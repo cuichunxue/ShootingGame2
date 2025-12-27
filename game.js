@@ -1157,8 +1157,13 @@
 
             console.log('[DEBUG] Total balloons created:', STATE.targets.length, '(answer + ' + created + ' others)');
 
+            // Log all numbers in STATE.targets
+            const numbersInTargets = STATE.targets.map(t => t.userData.number);
+            console.log('[DEBUG] Numbers in STATE.targets:', numbersInTargets);
+
             // Update debug display with creation status
             debugDiv.innerHTML += `<div style="color: ${STATE.targets.length > 0 ? '#0f0' : '#f00'};">風船数: ${STATE.targets.length}</div>`;
+            debugDiv.innerHTML += `<div style="color: #ff0;">実際: [${numbersInTargets.join(', ')}]</div>`;
         }
 
         function updateTargets(deltaTime) {
