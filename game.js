@@ -820,8 +820,8 @@
         function createSingleCrosshair(index) {
             const group = new THREE.Group();
 
-            // Different colors for each hand (hand 0 = cyan, hand 1 = magenta)
-            const defaultColor = index === 0 ? 0x00ffff : 0xff00ff;
+            // Different colors for each hand (hand 0 = green, hand 1 = red)
+            const defaultColor = index === 0 ? 0x00ff00 : 0xff0000;
 
             // Large outer ring - very visible
             const ringMat = new THREE.MeshBasicMaterial({
@@ -1364,8 +1364,8 @@
                 crosshair.visible = true;
 
                 // Hand-specific colors for better distinction
-                const readyColor = handIndex === 0 ? 0x00ffff : 0xff00ff;  // Cyan or Magenta
-                const partialColor = handIndex === 0 ? 0x00aaaa : 0xaa00aa;  // Darker cyan/magenta
+                const readyColor = handIndex === 0 ? 0x00ff00 : 0xff0000;  // Green or Red
+                const partialColor = handIndex === 0 ? 0x00aa00 : 0xaa0000;  // Darker green/red
 
                 // Change color based on state
                 if (isGunPose && isIndexExtended) {
@@ -1475,11 +1475,11 @@
             playSFX('shoot');
             STATE.player.shots++;
 
-            // Change crosshair to RED when firing
-            setCrosshairColor(handIndex, 0xff0000);
+            // Change crosshair to WHITE when firing (bright flash)
+            setCrosshairColor(handIndex, 0xffffff);
             setTimeout(() => {
                 // Return to default color for this hand
-                const defaultColor = handIndex === 0 ? 0x00ffff : 0xff00ff;
+                const defaultColor = handIndex === 0 ? 0x00ff00 : 0xff0000;
                 setCrosshairColor(handIndex, defaultColor);
             }, 200);
 
@@ -2980,7 +2980,7 @@
             // Hide crosshair after a moment
             setTimeout(() => {
                 if (STATE.crosshairs[0]) {
-                    setCrosshairColor(0, 0x00ffff);  // Back to cyan (hand 0 color)
+                    setCrosshairColor(0, 0x00ff00);  // Back to green (hand 0 color)
                     if (!STATE.modelReady) {
                         STATE.crosshairs[0].visible = false;
                     }
