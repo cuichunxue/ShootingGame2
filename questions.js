@@ -14,7 +14,7 @@ const GRADE_CURRICULUMS = {
             subtraction: { level: 1, correct: 0, total: 0 }
         },
         templates: [
-            // たし算 (1桁 + 1桁)
+            // たし算 (1桁 + 1桁) - 絵文字で楽しく
             {
                 type: 'addition_1digit',
                 category: 'addition',
@@ -22,10 +22,17 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 1 + Math.floor(Math.random() * 9);
                     const b = 1 + Math.floor(Math.random() * (10 - a));
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: '' };
+                    const emojis = ['🍎', '🍊', '🍌', '🍇', '🍓', '⚽', '🎈', '⭐', '🌸', '🦋'];
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    return {
+                        question: `${emoji} ${a} + ${b} = ?`,
+                        answer: a + b,
+                        strategy: [],
+                        hint: '指で数えてもいいよ！'
+                    };
                 }
             },
-            // 10をつくる
+            // 10をつくる - 計算のコツ！
             {
                 type: 'addition_make10',
                 category: 'addition',
@@ -33,10 +40,15 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 6 + Math.floor(Math.random() * 4);
                     const toTen = 10 - a;
-                    return { question: `${a} + ${toTen}`, answer: 10, strategy: [10], hint: `10をつくろう！` };
+                    return {
+                        question: `💡 ${a} + ${toTen}`,
+                        answer: 10,
+                        strategy: [10],
+                        hint: `${a}と${toTen}で10！`
+                    };
                 }
             },
-            // くり上がりのあるたし算
+            // くり上がりのあるたし算 - 10のかたまり戦略
             {
                 type: 'addition_carry',
                 category: 'addition',
@@ -44,10 +56,17 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 7 + Math.floor(Math.random() * 3);
                     const b = 4 + Math.floor(Math.random() * 5);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [10], hint: `10をつくって考えよう` };
+                    const toTen = 10 - a;
+                    const remain = b - toTen;
+                    return {
+                        question: `🎯 ${a} + ${b}`,
+                        answer: a + b,
+                        strategy: [10, 10 + remain],
+                        hint: `${a}+${toTen}=10、10+${remain}`
+                    };
                 }
             },
-            // ひき算 (1桁)
+            // ひき算 (1桁) - お菓子の問題
             {
                 type: 'subtraction_1digit',
                 category: 'subtraction',
@@ -55,20 +74,33 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 5 + Math.floor(Math.random() * 5);
                     const b = 1 + Math.floor(Math.random() * a);
-                    return { question: `${a} − ${b}`, answer: a - b, strategy: [], hint: '' };
+                    const items = ['🍪クッキー', '🍬あめ', '🎁プレゼント', '📚本'];
+                    const item = items[Math.floor(Math.random() * items.length)];
+                    return {
+                        question: `${item}${a}個−${b}個`,
+                        answer: a - b,
+                        strategy: [],
+                        hint: '残りはいくつ？'
+                    };
                 }
             },
-            // 10からひく
+            // 10からひく - 補数を覚えよう
             {
                 type: 'subtraction_from10',
                 category: 'subtraction',
                 skillLevel: 2,
                 generate: () => {
                     const b = 1 + Math.floor(Math.random() * 9);
-                    return { question: `10 − ${b}`, answer: 10 - b, strategy: [], hint: '10からひこう' };
+                    const ans = 10 - b;
+                    return {
+                        question: `🔟 10 − ${b}`,
+                        answer: ans,
+                        strategy: [ans],
+                        hint: `${b}と${ans}で10！`
+                    };
                 }
             },
-            // くり下がりのあるひき算
+            // くり下がりのあるひき算 - 10のかたまり戦略
             {
                 type: 'subtraction_borrow',
                 category: 'subtraction',
@@ -76,8 +108,31 @@ const GRADE_CURRICULUMS = {
                 generate: () => {
                     const a = 11 + Math.floor(Math.random() * 8);
                     const b = 3 + Math.floor(Math.random() * 7);
-                    if (a - b < 0) return this.generate();
-                    return { question: `${a} − ${b}`, answer: a - b, strategy: [10], hint: '10をつかって考えよう' };
+                    if (a - b < 0 || a % 10 >= b) return this.generate();
+                    const tens = Math.floor(a / 10) * 10;
+                    const ones = a % 10;
+                    return {
+                        question: `🎲 ${a} − ${b}`,
+                        answer: a - b,
+                        strategy: [tens, 10 - b + ones],
+                        hint: `10から${b}をひいて、${ones}をたす`
+                    };
+                }
+            },
+            // 実生活：お金の問題
+            {
+                type: 'money_simple',
+                category: 'addition',
+                skillLevel: 2,
+                generate: () => {
+                    const a = Math.floor(Math.random() * 5) + 1;
+                    const b = Math.floor(Math.random() * 5) + 1;
+                    return {
+                        question: `💰 ${a}円+${b}円`,
+                        answer: a + b,
+                        strategy: [],
+                        hint: '全部でいくら？'
+                    };
                 }
             }
         ]
@@ -97,102 +152,173 @@ const GRADE_CURRICULUMS = {
             units: { level: 1, correct: 0, total: 0 }
         },
         templates: [
-            // 2桁のたし算
+            // お金の問題：おつり計算
+            {
+                type: 'money_change',
+                category: 'subtraction',
+                skillLevel: 1,
+                generate: () => {
+                    const prices = [30, 40, 50, 60, 70];
+                    const price = prices[Math.floor(Math.random() * prices.length)];
+                    const paid = 100;
+                    return {
+                        question: `💴 100円で${price}円のおかし、おつりは？`,
+                        answer: paid - price,
+                        strategy: [100 - price],
+                        hint: '100円から引こう'
+                    };
+                }
+            },
+            // 2桁のたし算 - キリの良い数に
             {
                 type: 'addition_2digit',
                 category: 'addition',
                 skillLevel: 1,
                 generate: () => {
-                    const a = 10 + Math.floor(Math.random() * 90);
-                    const b = 1 + Math.floor(Math.random() * 50);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: '' };
+                    const a = 20 + Math.floor(Math.random() * 70);
+                    const b = 10 + Math.floor(Math.random() * 30);
+                    const roundA = Math.round(a / 10) * 10;
+                    const diff = a - roundA;
+                    return {
+                        question: `🧮 ${a} + ${b}`,
+                        answer: a + b,
+                        strategy: [roundA, roundA + b, roundA + b + diff],
+                        hint: `${a}≒${roundA}で計算`
+                    };
                 }
             },
-            // くり上がりのある2桁のたし算
-            {
-                type: 'addition_2digit_carry',
-                category: 'addition',
-                skillLevel: 2,
-                generate: () => {
-                    const a = 25 + Math.floor(Math.random() * 50);
-                    const b = 15 + Math.floor(Math.random() * 40);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: 'くり上がりに注意！' };
-                }
-            },
-            // 3桁のたし算
+            // 3桁のたし算 - 100のかたまり
             {
                 type: 'addition_3digit',
                 category: 'addition',
                 skillLevel: 3,
                 generate: () => {
                     const a = 100 + Math.floor(Math.random() * 400);
-                    const b = 50 + Math.floor(Math.random() * 300);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: '' };
+                    const b = 50 + Math.floor(Math.random() * 200);
+                    const hundreds = Math.floor((a + b) / 100) * 100;
+                    return {
+                        question: `🎯 ${a} + ${b}`,
+                        answer: a + b,
+                        strategy: [hundreds],
+                        hint: '100のかたまりで考えよう'
+                    };
                 }
             },
-            // 2桁のひき算
+            // 九九 (簡単) - 絵文字で楽しく
             {
-                type: 'subtraction_2digit',
-                category: 'subtraction',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 30 + Math.floor(Math.random() * 70);
-                    const b = 5 + Math.floor(Math.random() * (a - 10));
-                    return { question: `${a} − ${b}`, answer: a - b, strategy: [], hint: '' };
-                }
-            },
-            // くり下がりのある2桁のひき算
-            {
-                type: 'subtraction_2digit_borrow',
-                category: 'subtraction',
-                skillLevel: 2,
-                generate: () => {
-                    const a = 40 + Math.floor(Math.random() * 60);
-                    const ones = (a % 10) + 2;
-                    const b = 10 + Math.min(ones, 9);
-                    return { question: `${a} − ${b}`, answer: a - b, strategy: [], hint: 'くり下がりに注意！' };
-                }
-            },
-            // 九九 (2の段〜5の段)
-            {
-                type: 'multiplication_2to5',
+                type: 'multiplication_easy',
                 category: 'multiplication',
                 skillLevel: 1,
                 generate: () => {
-                    const a = 2 + Math.floor(Math.random() * 4);
+                    const tables = [2, 3, 4, 5];
+                    const a = tables[Math.floor(Math.random() * tables.length)];
                     const b = 1 + Math.floor(Math.random() * 9);
-                    return { question: `${a} × ${b}`, answer: a * b, strategy: [], hint: `${a}の段` };
+                    const contexts = [
+                        { emoji: '🍎', item: 'りんご' },
+                        { emoji: '🍪', item: 'クッキー' },
+                        { emoji: '⚽', item: 'ボール' },
+                        { emoji: '📚', item: '本' }
+                    ];
+                    const ctx = contexts[Math.floor(Math.random() * contexts.length)];
+                    return {
+                        question: `${ctx.emoji} ${a}×${b}`,
+                        answer: a * b,
+                        strategy: [],
+                        hint: `${a}の段！`
+                    };
                 }
             },
-            // 九九 (6の段〜9の段)
+            // 九九 (難しい) - 7,8,9の段
             {
-                type: 'multiplication_6to9',
+                type: 'multiplication_hard',
                 category: 'multiplication',
                 skillLevel: 2,
                 generate: () => {
-                    const a = 6 + Math.floor(Math.random() * 4);
-                    const b = 1 + Math.floor(Math.random() * 9);
-                    return { question: `${a} × ${b}`, answer: a * b, strategy: [], hint: `${a}の段` };
+                    const hard = [7, 8, 9];
+                    const a = hard[Math.floor(Math.random() * hard.length)];
+                    const b = 6 + Math.floor(Math.random() * 4);  // 6〜9
+                    return {
+                        question: `💪 ${a} × ${b}`,
+                        answer: a * b,
+                        strategy: [(a * 5), (a * 5) + (a * (b - 5))],
+                        hint: `${a}×5=${a * 5}から考える`
+                    };
                 }
             },
-            // 長さ (cm と m)
+            // 長さ：定規の問題
             {
                 type: 'length_cm_m',
                 category: 'units',
                 skillLevel: 1,
                 generate: () => {
                     const m = 1 + Math.floor(Math.random() * 5);
-                    return { question: `${m}m = ?cm`, answer: m * 100, strategy: [100], hint: '1m=100cm' };
+                    return {
+                        question: `📏 ${m}m = ?cm`,
+                        answer: m * 100,
+                        strategy: [100, m * 100],
+                        hint: '1m=100cm だよ'
+                    };
                 }
             },
-            // かさ (L と dL)
+            // 時間の問題
             {
-                type: 'volume_L_dL',
-                category: 'units',
-                skillLevel: 1,
+                type: 'time_calculation',
+                category: 'addition',
+                skillLevel: 2,
                 generate: () => {
-                    const L = 1 + Math.floor(Math.random() * 5);
-                    return { question: `${L}L = ?dL`, answer: L * 10, strategy: [10], hint: '1L=10dL' };
+                    const start = [30, 45, 15, 20];
+                    const duration = [15, 30, 20, 10];
+                    const s = start[Math.floor(Math.random() * start.length)];
+                    const d = duration[Math.floor(Math.random() * duration.length)];
+                    return {
+                        question: `⏰ ${s}分+${d}分`,
+                        answer: s + d,
+                        strategy: [],
+                        hint: '時計で考えよう'
+                    };
+                }
+            },
+            // 買い物の問題
+            {
+                type: 'shopping',
+                category: 'addition',
+                skillLevel: 2,
+                generate: () => {
+                    const items = [
+                        { name: '🍫チョコ', price: 80 },
+                        { name: '🍬あめ', price: 50 },
+                        { name: '🍪クッキー', price: 120 },
+                        { name: '🧃ジュース', price: 100 }
+                    ];
+                    const item1 = items[Math.floor(Math.random() * items.length)];
+                    let item2 = items[Math.floor(Math.random() * items.length)];
+                    while (item2.name === item1.name) {
+                        item2 = items[Math.floor(Math.random() * items.length)];
+                    }
+                    const total = item1.price + item2.price;
+                    return {
+                        question: `🛒 ${item1.name}${item1.price}円と${item2.name}${item2.price}円`,
+                        answer: total,
+                        strategy: [Math.round(total / 10) * 10],
+                        hint: '合計いくら？'
+                    };
+                }
+            },
+            // 九九の逆算
+            {
+                type: 'division_intro',
+                category: 'multiplication',
+                skillLevel: 3,
+                generate: () => {
+                    const a = 2 + Math.floor(Math.random() * 7);  // 2-8
+                    const b = 2 + Math.floor(Math.random() * 7);  // 2-8
+                    const answer = a * b;
+                    return {
+                        question: `❓ ${answer} ÷ ${a}`,
+                        answer: b,
+                        strategy: [a * b],
+                        hint: `${a}×?=${answer}`
+                    };
                 }
             }
         ]
@@ -213,111 +339,160 @@ const GRADE_CURRICULUMS = {
             units: { level: 2, correct: 0, total: 0 }
         },
         templates: [
-            // 大きな数のたし算
-            {
-                type: 'addition_large',
-                category: 'addition',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 100 + Math.floor(Math.random() * 900);
-                    const b = 100 + Math.floor(Math.random() * 500);
-                    return { question: `${a} + ${b}`, answer: a + b, strategy: [], hint: '' };
-                }
-            },
-            // 大きな数のひき算
-            {
-                type: 'subtraction_large',
-                category: 'subtraction',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 200 + Math.floor(Math.random() * 800);
-                    const b = 50 + Math.floor(Math.random() * (a - 100));
-                    return { question: `${a} − ${b}`, answer: a - b, strategy: [], hint: '' };
-                }
-            },
-            // 2桁×1桁
-            {
-                type: 'multiplication_2digit_1digit',
-                category: 'multiplication',
-                skillLevel: 1,
-                generate: () => {
-                    const a = 11 + Math.floor(Math.random() * 9);
-                    const b = 2 + Math.floor(Math.random() * 8);
-                    return { question: `${a} × ${b}`, answer: a * b, strategy: [10 * b], hint: `10×${b}から考えよう` };
-                }
-            },
-            // かけ算の工夫 (×5)
+            // ×5のコツ - 10の半分
             {
                 type: 'multiplication_5trick',
                 category: 'multiplication',
                 skillLevel: 2,
                 generate: () => {
-                    const b = 11 + Math.floor(Math.random() * 9);
-                    return { question: `${b} × 5`, answer: b * 5, strategy: [b * 10], hint: `${b}×10÷2` };
+                    const b = 12 + Math.floor(Math.random() * 17);  // 12-28
+                    const trick = b * 10;
+                    return {
+                        question: `💡 ${b} × 5`,
+                        answer: b * 5,
+                        strategy: [trick, trick / 2],
+                        hint: `${b}×10=${trick}の半分！`
+                    };
                 }
             },
-            // かけ算の工夫 (×9)
+            // ×9のコツ - 10から引く
             {
                 type: 'multiplication_9trick',
                 category: 'multiplication',
                 skillLevel: 2,
                 generate: () => {
-                    const b = 11 + Math.floor(Math.random() * 9);
-                    return { question: `${b} × 9`, answer: b * 9, strategy: [b * 10], hint: `${b}×10−${b}` };
+                    const b = 11 + Math.floor(Math.random() * 9);  // 11-19
+                    return {
+                        question: `🎯 ${b} × 9`,
+                        answer: b * 9,
+                        strategy: [b * 10, b * 10 - b],
+                        hint: `${b}×10=${b * 10}から${b}を引く`
+                    };
                 }
             },
-            // わり算 (九九の範囲)
+            // 2桁×1桁 - 分解
             {
-                type: 'division_simple',
+                type: 'multiplication_2digit_1digit',
+                category: 'multiplication',
+                skillLevel: 1,
+                generate: () => {
+                    const a = 11 + Math.floor(Math.random() * 19);  // 11-29
+                    const b = 3 + Math.floor(Math.random() * 6);     // 3-8
+                    const tens = Math.floor(a / 10) * 10;
+                    const ones = a % 10;
+                    return {
+                        question: `📐 ${a} × ${b}`,
+                        answer: a * b,
+                        strategy: [tens * b, ones * b, tens * b + ones * b],
+                        hint: `${tens}×${b}+${ones}×${b}`
+                    };
+                }
+            },
+            // わり算：等分の問題
+            {
+                type: 'division_equal',
                 category: 'division',
                 skillLevel: 1,
                 generate: () => {
-                    const answer = 2 + Math.floor(Math.random() * 8);
-                    const b = 2 + Math.floor(Math.random() * 9);
-                    const a = answer * b;
-                    return { question: `${a} ÷ ${b}`, answer, strategy: [], hint: `${b}×?=${a}` };
+                    const people = 3 + Math.floor(Math.random() * 6);  // 3-8人
+                    const each = 4 + Math.floor(Math.random() * 7);     // 4-10個
+                    const total = people * each;
+                    const emojis = ['🍎', '🍬', '⚽', '📚', '🍪'];
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    return {
+                        question: `${emoji}${total}個÷${people}人`,
+                        answer: each,
+                        strategy: [people * each],
+                        hint: '1人何個？'
+                    };
                 }
             },
-            // わり算 (2桁÷1桁)
+            // わり算：あまりあり
             {
-                type: 'division_2digit',
+                type: 'division_remainder',
                 category: 'division',
                 skillLevel: 2,
                 generate: () => {
-                    const answer = 5 + Math.floor(Math.random() * 10);
-                    const b = 2 + Math.floor(Math.random() * 6);
-                    return { question: `${answer * b} ÷ ${b}`, answer, strategy: [], hint: '' };
+                    const divisor = 3 + Math.floor(Math.random() * 6);   // 3-8
+                    const quotient = 4 + Math.floor(Math.random() * 7);  // 4-10
+                    const remainder = 1 + Math.floor(Math.random() * (divisor - 1));
+                    const dividend = divisor * quotient + remainder;
+                    return {
+                        question: `🎲 ${dividend} ÷ ${divisor}...あまり?`,
+                        answer: remainder,
+                        strategy: [divisor * quotient],
+                        hint: `${divisor}×${quotient}=${divisor * quotient}`
+                    };
                 }
             },
-            // 重さ (kg と g)
+            // 重さの実生活問題
             {
-                type: 'weight_kg_g',
+                type: 'weight_real',
                 category: 'units',
                 skillLevel: 1,
                 generate: () => {
-                    const kg = 1 + Math.floor(Math.random() * 5);
-                    return { question: `${kg}kg = ?g`, answer: kg * 1000, strategy: [1000], hint: '1kg=1000g' };
-                }
-            },
-            // 長さ (mm, cm, m)
-            {
-                type: 'length_3units',
-                category: 'units',
-                skillLevel: 2,
-                generate: () => {
-                    const choices = [
-                        { q: () => {
-                            const cm = 1 + Math.floor(Math.random() * 20);
-                            return { question: `${cm}cm = ?mm`, answer: cm * 10, hint: '1cm=10mm' };
-                        }},
-                        { q: () => {
-                            const m = 1 + Math.floor(Math.random() * 5);
-                            return { question: `${m}m = ?cm`, answer: m * 100, hint: '1m=100cm' };
-                        }}
+                    const items = [
+                        { name: '🍎りんご', weight: 200 },
+                        { name: '📚本', weight: 500 },
+                        { name: '⚽ボール', weight: 400 }
                     ];
-                    const choice = choices[Math.floor(Math.random() * choices.length)];
-                    const result = choice.q();
-                    return { question: result.question, answer: result.answer, strategy: [], hint: result.hint };
+                    const item = items[Math.floor(Math.random() * items.length)];
+                    const count = 2 + Math.floor(Math.random() * 4);  // 2-5個
+                    return {
+                        question: `⚖️ ${item.name}${item.weight}g×${count}個`,
+                        answer: item.weight * count,
+                        strategy: [item.weight * count],
+                        hint: '全部で何g？'
+                    };
+                }
+            },
+            // 長さの計算
+            {
+                type: 'length_calculation',
+                category: 'addition',
+                skillLevel: 2,
+                generate: () => {
+                    const a = 50 + Math.floor(Math.random() * 150);  // 50-199cm
+                    const b = 30 + Math.floor(Math.random() * 100);  // 30-129cm
+                    return {
+                        question: `📏 ${a}cm+${b}cm=?m`,
+                        answer: Math.floor((a + b) / 100),
+                        strategy: [a + b],
+                        hint: '100cm=1m'
+                    };
+                }
+            },
+            // 買い物：複数商品
+            {
+                type: 'shopping_multi',
+                category: 'multiplication',
+                skillLevel: 2,
+                generate: () => {
+                    const price = [50, 60, 70, 80, 90];
+                    const p = price[Math.floor(Math.random() * price.length)];
+                    const count = 3 + Math.floor(Math.random() * 5);  // 3-7個
+                    return {
+                        question: `🛒 ${p}円×${count}個`,
+                        answer: p * count,
+                        strategy: [p * count],
+                        hint: '全部でいくら？'
+                    };
+                }
+            },
+            // 時間の計算
+            {
+                type: 'time_real',
+                category: 'subtraction',
+                skillLevel: 2,
+                generate: () => {
+                    const start = 8 + Math.floor(Math.random() * 3);  // 8-10時
+                    const end = 12 + Math.floor(Math.random() * 3);   // 12-14時
+                    return {
+                        question: `🕐 ${start}時〜${end}時`,
+                        answer: end - start,
+                        strategy: [end - start],
+                        hint: '何時間？'
+                    };
                 }
             }
         ]
