@@ -11,6 +11,13 @@
         const QUESTION_TEMPLATES = CURRENT_CURRICULUM.templates;
         let SKILL_CATEGORIES = JSON.parse(JSON.stringify(CURRENT_CURRICULUM.categories));
 
+        // Debug logging
+        console.log('[DEBUG] Selected Grade:', SELECTED_GRADE);
+        console.log('[DEBUG] Curriculum:', CURRENT_CURRICULUM.name);
+        console.log('[DEBUG] Question templates count:', QUESTION_TEMPLATES.length);
+        console.log('[DEBUG] Question types:', QUESTION_TEMPLATES.map(t => t.type));
+        console.log('[DEBUG] Skill categories:', Object.keys(SKILL_CATEGORIES));
+
         // ============================================
         // OPTIMIZED GLOBAL STATE
         // ============================================
@@ -213,6 +220,15 @@
             const template = weighted[Math.floor(Math.random() * weighted.length)];
             const q = template.generate();
             q.questionType = template.type;  // Track type for skill update
+
+            // Debug logging for generated question
+            console.log('[DEBUG] Generated question:', {
+                type: q.questionType,
+                question: q.question,
+                answer: q.answer,
+                category: template.category,
+                skillLevel: template.skillLevel
+            });
 
             const distractors = new Set();
 
