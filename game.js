@@ -2272,12 +2272,21 @@
                 const x = (Math.random() - 0.5) * 18;
                 const y = -3 + Math.random() * 8;
                 target.position.set(x, y, -8 - Math.random() * 4);
+
+                // CRITICAL: Set scale BEFORE configuring sprite
+                target.visible = true;
                 target.scale.set(0.8, 1.0, 0.8);
 
+                // Configure sprite
                 const sprite = target.userData.sprite;
-                sprite.material.map = getNumberTexture(number);
+                const texture = getNumberTexture(number);
+                sprite.material.map = texture;
+                sprite.material.opacity = 1.0;
+                sprite.material.transparent = true;
                 sprite.material.needsUpdate = true;
+                sprite.position.set(0, 0.2, 1.2);
                 sprite.scale.set(1.8, 1.8, 1);
+                sprite.visible = true;
 
                 target.userData = {
                     number,
@@ -2436,12 +2445,21 @@
             const x = (Math.random() - 0.5) * 18;
             const y = -4 + Math.random() * 9;
             target.position.set(x, y, -7 - Math.random() * 5);
+
+            // CRITICAL: Set scale BEFORE configuring sprite
+            target.visible = true;
             target.scale.set(0.7, 0.85, 0.7);  // Small targets
 
+            // Configure sprite
             const sprite = target.userData.sprite;
-            sprite.material.map = getNumberTexture(number);
+            const texture = getNumberTexture(number);
+            sprite.material.map = texture;
+            sprite.material.opacity = 1.0;
+            sprite.material.transparent = true;
             sprite.material.needsUpdate = true;
+            sprite.position.set(0, 0.2, 1.2);
             sprite.scale.set(1.5, 1.5, 1);
+            sprite.visible = true;
 
             target.userData = {
                 number,
@@ -2493,12 +2511,21 @@
                 boss.material.emissive.setHex(0xff0000);
                 boss.material.emissiveIntensity = 0.8;
                 boss.position.set(0, 2, -10);
+
+                // CRITICAL: Set scale BEFORE configuring sprite
+                boss.visible = true;
                 boss.scale.set(2.2, 2.8, 2.2);
 
+                // Configure sprite
                 const sprite = boss.userData.sprite;
-                sprite.material.map = getNumberTexture(q.answer);
+                const texture = getNumberTexture(q.answer);
+                sprite.material.map = texture;
+                sprite.material.opacity = 1.0;
+                sprite.material.transparent = true;
                 sprite.material.needsUpdate = true;
+                sprite.position.set(0, 0.2, 1.2);
                 sprite.scale.set(2.5, 2.5, 1);
+                sprite.visible = true;
 
                 boss.userData = {
                     number: q.answer,
@@ -2526,12 +2553,21 @@
 
                 const angle = (i / minionCount) * Math.PI * 2;
                 minion.position.set(Math.cos(angle) * 4, 1 + Math.sin(angle) * 2, -8);
+
+                // CRITICAL: Set scale BEFORE configuring sprite
+                minion.visible = true;
                 minion.scale.set(1, 1.2, 1);
 
+                // Configure sprite
                 const sprite = minion.userData.sprite;
-                sprite.material.map = getNumberTexture(wrongNum);
+                const texture = getNumberTexture(wrongNum);
+                sprite.material.map = texture;
+                sprite.material.opacity = 1.0;
+                sprite.material.transparent = true;
                 sprite.material.needsUpdate = true;
+                sprite.position.set(0, 0.2, 1.2);
                 sprite.scale.set(1.8, 1.8, 1);
+                sprite.visible = true;
 
                 minion.userData = {
                     number: wrongNum,
