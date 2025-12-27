@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>算数シューティングゲーム</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ゲーム画面専用の追加スタイル */
+        body {
+            background: #000;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #hiddenVideo {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .game-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border-radius: 10px;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            text-align: right;
+        }
+
+        .game-info .grade-badge {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .ranking {
+            color: white;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            min-width: 300px;
+        }
+
+        .ranking-item {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 戻るボタン -->
+    <button class="back-btn" onclick="goBack()">← 学年選択に戻る</button>
+
+    <!-- 学年情報表示 -->
+    <div class="game-info" id="gameInfo">
+        <div class="grade-badge" id="gradeBadge"></div>
+        <div id="gradeText"></div>
+    </div>
+
+    <!-- ゲームキャンバス -->
+    <canvas id="gameCanvas"></canvas>
+    <video id="hiddenVideo" playsinline autoplay></video>
+
+    <!-- 開始オーバーレイ -->
+    <div id="startOverlay" class="overlay">
+        <h1>🎯 算数シューティングゲーム</h1>
+        <p id="welcomeText">カメラを使って手で風船を撃とう！</p>
+        <p style="color: #888; font-size: 0.9rem;">※ カメラへのアクセスを許可してください</p>
+        <button class="btn" onclick="requestStart()">ゲームスタート</button>
+    </div>
+
+    <!-- ゲームオーバーオーバーレイ -->
+    <div id="gameOverOverlay" class="overlay hidden">
+        <h1>ゲームオーバー</h1>
+        <div class="ranking" id="gameOverStats"></div>
+        <div class="btn-group">
+            <button class="btn" onclick="restartGame()">もう一度</button>
+            <button class="btn btn-secondary" onclick="goBack()">学年選択に戻る</button>
+        </div>
+    </div>
+
+    <!-- 結果オーバーレイ -->
+    <div id="rankingOverlay" class="overlay hidden">
+        <h1>結果発表</h1>
+        <div class="ranking" id="rankingDisplay"></div>
+        <div class="btn-group">
+            <button class="btn" onclick="nextRound()">次のラウンド</button>
+            <button class="btn btn-secondary" onclick="goBack()">学年選択に戻る</button>
+        </div>
+    </div>
+
+    <!-- 外部ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
+
+    <!-- 問題データ -->
+    <script src="questions.js"></script>
+
+    <!-- ゲームロジック -->
+    <script src="game.js"></script>
+
+    <script>
+        // 学年選択から戻る
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // 学年情報を表示
+        function displayGradeInfo() {
+            const selectedGrade = localStorage.getItem('selectedGrade') || '1';
+            const curriculum = GRADE_CURRICULUMS[selectedGrade];
+
+            if (curriculum) {
+                document.getElementById('gradeBadge').textContent = curriculum.emoji;
+                document.getElementById('gradeText').textContent = curriculum.name;
+                document.getElementById('welcomeText').textContent =
+                    `${curriculum.name}の問題に挑戦しよう！ ${curriculum.description}`;
+            }
+        }
+
+        // ページロード時に学年情報を表示
+        window.addEventListener('DOMContentLoaded', displayGradeInfo);
+    </script>
+</body>
+</html>

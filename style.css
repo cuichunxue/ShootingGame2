@@ -1,0 +1,364 @@
+/* ==========================================
+   Math Shooting Game - Styles
+   学年選択機能付き算数シューティングゲーム
+   ========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    touch-action: none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ==========================================
+   メイン画面 (学年選択)
+   ========================================== */
+
+.main-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 2000;
+    padding: 2rem;
+}
+
+.main-screen.hidden {
+    display: none;
+}
+
+.main-title {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.main-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.grade-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 2rem;
+}
+
+.grade-btn {
+    padding: 1.5rem 1rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 16px;
+    background: white;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.grade-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.grade-btn:active {
+    transform: scale(0.95);
+}
+
+.grade-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.grade-name {
+    font-size: 1.3rem;
+    color: #667eea;
+}
+
+.grade-desc {
+    font-size: 0.9rem;
+    color: #764ba2;
+    font-weight: normal;
+}
+
+/* グレードごとの色分け */
+.grade-btn[data-grade="1"] { background: linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%); }
+.grade-btn[data-grade="2"] { background: linear-gradient(135deg, #FFF4E5 0%, #FFD9B3 100%); }
+.grade-btn[data-grade="3"] { background: linear-gradient(135deg, #FFFBE5 0%, #FFF3B3 100%); }
+.grade-btn[data-grade="4"] { background: linear-gradient(135deg, #E5F9FF 0%, #B3E5FF 100%); }
+.grade-btn[data-grade="5"] { background: linear-gradient(135deg, #F0E5FF 0%, #D9B3FF 100%); }
+.grade-btn[data-grade="6"] { background: linear-gradient(135deg, #FFE5F9 0%, #FFB3E6 100%); }
+
+/* ==========================================
+   ゲーム画面
+   ========================================== */
+
+#gameCanvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+}
+
+#hiddenVideo {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================
+   オーバーレイ
+   ========================================== */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    transition: opacity 0.3s;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.overlay p {
+    color: #aaa;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    padding: 0 1rem;
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   ボタン
+   ========================================== */
+
+.btn {
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 20px rgba(240, 147, 251, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    box-shadow: 0 4px 20px rgba(79, 172, 254, 0.4);
+}
+
+/* ==========================================
+   レスポンシブデザイン
+   ========================================== */
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .main-subtitle {
+        font-size: 1rem;
+    }
+
+    .grade-selection {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .grade-btn {
+        padding: 1.2rem 0.8rem;
+        font-size: 1rem;
+    }
+
+    .grade-emoji {
+        font-size: 2rem;
+    }
+
+    .grade-name {
+        font-size: 1.1rem;
+    }
+
+    .grade-desc {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 1.5rem;
+    }
+
+    .main-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .grade-selection {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+
+    .grade-btn {
+        padding: 1rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .grade-emoji {
+        font-size: 1.8rem;
+    }
+
+    .grade-name {
+        font-size: 1rem;
+    }
+
+    .grade-desc {
+        font-size: 0.75rem;
+    }
+}
+
+/* ==========================================
+   アニメーション
+   ========================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-screen > * {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.grade-btn {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.grade-btn:nth-child(1) { animation-delay: 0.1s; }
+.grade-btn:nth-child(2) { animation-delay: 0.2s; }
+.grade-btn:nth-child(3) { animation-delay: 0.3s; }
+.grade-btn:nth-child(4) { animation-delay: 0.4s; }
+.grade-btn:nth-child(5) { animation-delay: 0.5s; }
+.grade-btn:nth-child(6) { animation-delay: 0.6s; }
+
+/* ==========================================
+   ローディング
+   ========================================== */
+
+.loading {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   戻るボタン (ゲーム画面用)
+   ========================================== */
+
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.back-btn:active {
+    transform: scale(0.95);
+}
