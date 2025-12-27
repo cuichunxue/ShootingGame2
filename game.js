@@ -1596,11 +1596,10 @@
             if (isAnswer) {
                 // Immediately hide all other targets for instant question change
                 STATE.targets.forEach(t => {
-                    if (t !== target && t.visible) {
+                    if (t !== target) {
                         t.visible = false;
                     }
                 });
-                STATE.targets = STATE.targets.filter(t => t === target);
 
                 // Update skill - correct answer!
                 if (STATE.currentQuestion && STATE.currentQuestion.questionType) {
