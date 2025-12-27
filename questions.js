@@ -754,7 +754,17 @@ const GRADE_CURRICULUMS = {
                     const a = 1 + Math.floor(Math.random() * (denom - 2));
                     const b = 1 + Math.floor(Math.random() * (denom - a - 1));
                     const answer = fractionToString(a + b, denom);
-                    return { question: `${a}/${denom} + ${b}/${denom}`, answer, strategy: [], hint: '' };
+
+                    // 分数のおとりを生成
+                    const distractors = [];
+                    for (let i = 1; i < denom && distractors.length < 3; i++) {
+                        const frac = fractionToString(i, denom);
+                        if (frac !== answer) {
+                            distractors.push(frac);
+                        }
+                    }
+
+                    return { question: `${a}/${denom} + ${b}/${denom}`, answer, strategy: distractors, hint: '' };
                 }
             },
             // 分数のひき算 (同分母)
@@ -767,7 +777,17 @@ const GRADE_CURRICULUMS = {
                     const a = 3 + Math.floor(Math.random() * (denom - 3));
                     const b = 1 + Math.floor(Math.random() * (a - 1));
                     const answer = fractionToString(a - b, denom);
-                    return { question: `${a}/${denom} − ${b}/${denom}`, answer, strategy: [], hint: '' };
+
+                    // 分数のおとりを生成
+                    const distractors = [];
+                    for (let i = 1; i < denom && distractors.length < 3; i++) {
+                        const frac = fractionToString(i, denom);
+                        if (frac !== answer) {
+                            distractors.push(frac);
+                        }
+                    }
+
+                    return { question: `${a}/${denom} − ${b}/${denom}`, answer, strategy: distractors, hint: '' };
                 }
             },
             // 体積 (直方体)
@@ -837,7 +857,18 @@ const GRADE_CURRICULUMS = {
                     const mult = 2 + Math.floor(Math.random() * 5);
                     const answerNumer = numer * mult;
                     const answer = fractionToString(answerNumer, denom);
-                    return { question: `${numer}/${denom} × ${mult}`, answer, strategy: [], hint: '' };
+
+                    // 分数のおとりを生成（答えの近くの分数）
+                    const distractors = [];
+                    for (let offset of [-2, -1, 1, 2]) {
+                        if (distractors.length >= 3) break;
+                        const frac = fractionToString(answerNumer + offset, denom);
+                        if (frac !== answer && answerNumer + offset > 0) {
+                            distractors.push(frac);
+                        }
+                    }
+
+                    return { question: `${numer}/${denom} × ${mult}`, answer, strategy: distractors, hint: '' };
                 }
             },
             // 分数÷整数
@@ -851,7 +882,18 @@ const GRADE_CURRICULUMS = {
                     const denom = 3 + Math.floor(Math.random() * 7);
                     // 分数÷整数 = 分子そのまま、分母×整数
                     const answer = fractionToString(numer, denom * div);
-                    return { question: `${numer}/${denom} ÷ ${div}`, answer, strategy: [], hint: '' };
+
+                    // 分数のおとりを生成
+                    const distractors = [];
+                    const answerDenom = denom * div;
+                    for (let i = 1; i < answerDenom && distractors.length < 3; i++) {
+                        const frac = fractionToString(i, answerDenom);
+                        if (frac !== answer) {
+                            distractors.push(frac);
+                        }
+                    }
+
+                    return { question: `${numer}/${denom} ÷ ${div}`, answer, strategy: distractors, hint: '' };
                 }
             },
             // 分数のたし算 (異分母)
@@ -873,7 +915,16 @@ const GRADE_CURRICULUMS = {
                     const answerNumer = numer1 * (commonDenom / denom1) + numer2 * (commonDenom / denom2);
                     const answer = fractionToString(answerNumer, commonDenom);
 
-                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: [commonDenom], hint: '' };
+                    // 分数のおとりを生成
+                    const distractors = [];
+                    for (let i = 1; i < commonDenom && distractors.length < 3; i++) {
+                        const frac = fractionToString(i, commonDenom);
+                        if (frac !== answer) {
+                            distractors.push(frac);
+                        }
+                    }
+
+                    return { question: `${numer1}/${denom1} + ${numer2}/${denom2}`, answer, strategy: distractors, hint: '' };
                 }
             },
             // 比

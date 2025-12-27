@@ -232,29 +232,37 @@
 
             const distractors = new Set();
 
-            // Adaptive distractor range based on answer size
-            const answerMagnitude = Math.max(10, Math.abs(q.answer));
-            const offsetRange = answerMagnitude < 100 ? 5 : answerMagnitude < 500 ? 50 : 200;
+            // Check if answer is a string (fraction like "3/4")
+            const isFraction = typeof q.answer === 'string' && q.answer.includes('/');
 
-            let attempts = 0;
-            while (distractors.size < 3 && attempts < 20) {
-                attempts++;
-                let d;
-                if (q.answer >= 1000) {
-                    // For large numbers (unit conversions), use multiples
-                    const mult = [100, 500, 1000, 1500, 2000, 2500, 3000, 4000, 5000];
-                    d = mult[Math.floor(Math.random() * mult.length)];
-                } else if (q.answer >= 100) {
-                    // Medium numbers
-                    const offset = (Math.floor(Math.random() * 5) - 2) * 100;
-                    d = Math.max(100, q.answer + offset);
-                } else {
-                    // Small numbers
-                    const offset = Math.floor(Math.random() * 10) - 5;
-                    d = Math.max(0, q.answer + offset);
-                }
-                if (d !== q.answer && !q.strategy.includes(d) && d > 0) {
-                    distractors.add(d);
+            if (isFraction) {
+                // For fractions, use only strategy distractors (pre-generated in questions.js)
+                console.log('[DEBUG] Fraction question detected, using strategy distractors only');
+            } else {
+                // For numeric answers, generate adaptive distractors
+                const answerMagnitude = Math.max(10, Math.abs(q.answer));
+                const offsetRange = answerMagnitude < 100 ? 5 : answerMagnitude < 500 ? 50 : 200;
+
+                let attempts = 0;
+                while (distractors.size < 3 && attempts < 20) {
+                    attempts++;
+                    let d;
+                    if (q.answer >= 1000) {
+                        // For large numbers (unit conversions), use multiples
+                        const mult = [100, 500, 1000, 1500, 2000, 2500, 3000, 4000, 5000];
+                        d = mult[Math.floor(Math.random() * mult.length)];
+                    } else if (q.answer >= 100) {
+                        // Medium numbers
+                        const offset = (Math.floor(Math.random() * 5) - 2) * 100;
+                        d = Math.max(100, q.answer + offset);
+                    } else {
+                        // Small numbers
+                        const offset = Math.floor(Math.random() * 10) - 5;
+                        d = Math.max(0, q.answer + offset);
+                    }
+                    if (d !== q.answer && !q.strategy.includes(d) && d > 0) {
+                        distractors.add(d);
+                    }
                 }
             }
 
@@ -743,6 +751,14 @@
             // Clear background (transparent)
             ctx.clearRect(0, 0, 256, 256);
 
+            // Dynamic font size based on text length
+            let fontSize = 140;
+            if (key.length > 6) {
+                fontSize = 80;   // Even smaller for very long numbers
+            } else if (key.length > 4) {
+                fontSize = 100;  // Smaller for fractions like "3/4" or long decimals
+            }
+
             // Draw text with shadow for visibility
             ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
             ctx.shadowBlur = 8;
@@ -750,7 +766,7 @@
             ctx.shadowOffsetY = 2;
 
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 140px Arial';
+            ctx.font = `bold ${fontSize}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(key, 128, 128);
@@ -766,7 +782,7 @@
             texture.needsUpdate = true;  // Force texture update
             STATE.textureCache.set(key, texture);
 
-            console.log(`[TEXTURE] Texture created successfully for ${key}, size: ${canvas.width}x${canvas.height}`);
+            console.log(`[TEXTURE] Texture created successfully for ${key}, fontSize: ${fontSize}, size: ${canvas.width}x${canvas.height}`);
             return texture;
         }
 
