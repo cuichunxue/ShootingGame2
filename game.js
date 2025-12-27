@@ -1164,6 +1164,17 @@
         function updateTargets(deltaTime) {
             const time = performance.now() * 0.001;
 
+            // CRITICAL: Force hide ANY balloon not in STATE.targets
+            STATE.targetPool.forEach(poolTarget => {
+                if (!STATE.targets.includes(poolTarget)) {
+                    poolTarget.visible = false;
+                    poolTarget.scale.set(0, 0, 0);
+                    if (poolTarget.userData.sprite) {
+                        poolTarget.userData.sprite.visible = false;
+                    }
+                }
+            });
+
             STATE.targets.forEach(target => {
                 if (!target.visible || !target.userData.velocity) return;
 
